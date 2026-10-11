@@ -27,4 +27,8 @@ if (env('APP_STORAGE')) {
     $app->useStoragePath(env('APP_STORAGE'));
 }
 
+if (env('APP_BOOTSTRAP_PATH')) {
+    $app->useBootstrapPath(env('APP_BOOTSTRAP_PATH'));
+}
+
 return $app;
