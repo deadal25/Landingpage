@@ -14,11 +14,13 @@
     },
     {
       "src": "/images/(.*)",
-      "dest": "/images/$1"
+      "dest": "/images/$1",
+      "check": true
     },
     {
       "src": "/videos/(.*)",
-      "dest": "/videos/$1"
+      "dest": "/videos/$1",
+      "check": true
     },
     {
       "src": "/favicon.ico",

@@ -18,6 +18,17 @@ class AppServiceProvider extends ServiceProvider
                 'session.driver' => 'cookie',
             ]);
         }
+
+        $this->app->extend('url', function ($url, $app) {
+            $custom = new \App\Routing\UrlGenerator(
+                $app['router']->getRoutes(),
+                $url->getRequest(),
+                $app['config']['app.asset_url']
+            );
+            $custom->setSessionResolver(fn() => $app['session'] ?? null);
+            $custom->setKeyResolver(fn() => [$app['config']->get('app.key'), ...($app['config']->get('app.previous_keys') ?? [])]);
+            return $custom;
+        });
     }
 
     /**

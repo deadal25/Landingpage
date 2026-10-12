@@ -137,3 +137,30 @@ Route::post('SuperadminMusashi/login/submit', [AdminAuthController::class, 'logi
 Route::redirect('superadminmusashi', '/SuperadminMusashi');
 Route::redirect('superadmin', '/SuperadminMusashi');
 
+// Serve dynamic/uploaded media from storage or temporary directory across environments (e.g. Vercel)
+Route::get('/storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (file_exists($filePath)) {
+        $mime = mime_content_type($filePath) ?: 'application/octet-stream';
+        return response()->file($filePath, ['Content-Type' => $mime]);
+    }
+    abort(404);
+})->where('path', '.*');
+
+Route::get('/images/{folder}/{filename}', function ($folder, $filename) {
+    $candidates = [
+        public_path("images/{$folder}/{$filename}"),
+        storage_path("app/public/images/{$folder}/{$filename}"),
+        storage_path("app/public/{$folder}/{$filename}"),
+        sys_get_temp_dir() . "/images/{$folder}/{$filename}",
+    ];
+    foreach ($candidates as $candidate) {
+        if (file_exists($candidate)) {
+            $mime = mime_content_type($candidate) ?: 'application/octet-stream';
+            return response()->file($candidate, ['Content-Type' => $mime]);
+        }
+    }
+    abort(404);
+})->where('filename', '.*');
+
+

@@ -69,13 +69,94 @@ class SuperadminController extends Controller
     }
 
     /**
+     * Safely store an uploaded file across environments (local, standard hosting, Vercel serverless).
+     * Prevents read-only filesystem exceptions on Vercel by trying writable paths and fallbacks.
+     *
+     * @param \Illuminate\Http\UploadedFile|mixed $file
+     * @param string $folder Relative path, e.g. 'images/news', 'images/products', 'images/bod', 'images/hero'
+     * @param string|null $prefix Optional filename prefix
+     * @return string|null Web-accessible path or data URI
+     */
+    protected function storeUploadedFile($file, string $folder = 'images/news', ?string $prefix = null): ?string
+    {
+        if (!$file || !is_object($file) || !method_exists($file, 'isValid') || !$file->isValid()) {
+            return null;
+        }
+
+        $folder = trim($folder, '/');
+        $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $baseName = $prefix ? Str::slug($prefix) : Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $filename = time() . '_' . uniqid() . ($baseName ? '_' . $baseName : '') . '.' . $ext;
+
+        // 1. Try public_path first (standard hosting / localhost)
+        $publicDir = public_path($folder);
+        try {
+            if (!is_dir($publicDir)) {
+                @mkdir($publicDir, 0755, true);
+            }
+            if (is_dir($publicDir) && is_writable($publicDir)) {
+                $file->move($publicDir, $filename);
+                return '/' . $folder . '/' . $filename;
+            }
+        } catch (\Throwable $e) {
+            // Read-only filesystem fallback
+        }
+
+        // 2. Try storage_path('app/public/...') (writable /tmp/storage on Vercel)
+        try {
+            $storageDir = storage_path('app/public/' . $folder);
+            if (!is_dir($storageDir)) {
+                @mkdir($storageDir, 0755, true);
+            }
+            if (is_dir($storageDir) && is_writable($storageDir)) {
+                $file->move($storageDir, $filename);
+                return '/storage/' . $folder . '/' . $filename;
+            }
+        } catch (\Throwable $e) {
+            // Fall through
+        }
+
+        // 3. Try sys_get_temp_dir()
+        try {
+            $tmpDir = sys_get_temp_dir() . '/' . $folder;
+            if (!is_dir($tmpDir)) {
+                @mkdir($tmpDir, 0755, true);
+            }
+            if (is_dir($tmpDir) && is_writable($tmpDir)) {
+                $file->move($tmpDir, $filename);
+                return '/images/' . $folder . '/' . $filename;
+            }
+        } catch (\Throwable $e) {
+            // Fall through
+        }
+
+        // 4. Safe serverless fallback: Base64 data URI for images
+        try {
+            $mime = $file->getMimeType() ?: ('image/' . $ext);
+            if (str_starts_with($mime, 'image/')) {
+                $realPath = method_exists($file, 'getRealPath') ? $file->getRealPath() : null;
+                if ($realPath && file_exists($realPath)) {
+                    $content = @file_get_contents($realPath);
+                    if ($content !== false && strlen($content) > 0) {
+                        return 'data:' . $mime . ';base64,' . base64_encode($content);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Never throw unhandled exception
+        }
+
+        return null;
+    }
+
+    /**
      * Save landing page content & profile settings.
      */
     public function update(Request $request)
     {
         $data = $request->except(['_token', 'redirect_tab', 'redirect_lang', 'redirect_subtab']);
 
-        // 1. Handle multi-file uploads & existing gallery for Tech
+        // 1. Handle multi-file uploads & existing gallery for Technology
         if ($request->has('tech_gallery_submitted') || $request->hasFile('tech_gallery_new_files') || $request->has('tech_gallery_existing')) {
             $currentTechImages = $request->input('tech_gallery_existing', []);
             if (!is_array($currentTechImages)) {
@@ -87,15 +168,8 @@ class SuperadminController extends Controller
                     $uploadedTechFiles = [$uploadedTechFiles];
                 }
                 foreach ($uploadedTechFiles as $tFile) {
-                    if ($tFile && $tFile->isValid()) {
-                        $ext = strtolower($tFile->getClientOriginalExtension());
-                        $folder = 'images/hero';
-                        if (!file_exists(public_path($folder))) {
-                            mkdir(public_path($folder), 0755, true);
-                        }
-                        $filename = 'tech_gallery_' . time() . '_' . uniqid() . '.' . $ext;
-                        $tFile->move(public_path($folder), $filename);
-                        $currentTechImages[] = "{$folder}/{$filename}";
+                    if ($path = $this->storeUploadedFile($tFile, 'images/hero', 'tech_gallery')) {
+                        $currentTechImages[] = $path;
                     }
                 }
             }
@@ -122,15 +196,8 @@ class SuperadminController extends Controller
                     $uploadedInnovFiles = [$uploadedInnovFiles];
                 }
                 foreach ($uploadedInnovFiles as $iFile) {
-                    if ($iFile && $iFile->isValid()) {
-                        $ext = strtolower($iFile->getClientOriginalExtension());
-                        $folder = 'images/business';
-                        if (!file_exists(public_path($folder))) {
-                            mkdir(public_path($folder), 0755, true);
-                        }
-                        $filename = 'innov_gallery_' . time() . '_' . uniqid() . '.' . $ext;
-                        $iFile->move(public_path($folder), $filename);
-                        $currentInnovImages[] = "{$folder}/{$filename}";
+                    if ($path = $this->storeUploadedFile($iFile, 'images/business', 'innov_gallery')) {
+                        $currentInnovImages[] = $path;
                     }
                 }
             }
@@ -149,16 +216,10 @@ class SuperadminController extends Controller
             if (in_array($fileKey, ['tech_gallery_new_files', 'innov_gallery_new_files'])) {
                 continue;
             }
-            if ($file && is_object($file) && method_exists($file, 'isValid') && $file->isValid()) {
-                $targetSettingKey = preg_replace('/_file$/', '', $fileKey);
-                $ext = strtolower($file->getClientOriginalExtension());
-                $folder = str_contains($targetSettingKey, 'tech') ? 'images/hero' : 'images/business';
-                if (!file_exists(public_path($folder))) {
-                    mkdir(public_path($folder), 0755, true);
-                }
-                $filename = Str::slug($targetSettingKey) . '_' . time() . '.' . $ext;
-                $file->move(public_path($folder), $filename);
-                $data[$targetSettingKey] = "{$folder}/{$filename}";
+            $targetSettingKey = preg_replace('/_file$/', '', $fileKey);
+            $folder = str_contains($targetSettingKey, 'tech') ? 'images/hero' : 'images/business';
+            if ($path = $this->storeUploadedFile($file, $folder, $targetSettingKey)) {
+                $data[$targetSettingKey] = $path;
             }
             unset($data[$fileKey]);
         }
@@ -207,15 +268,10 @@ class SuperadminController extends Controller
                     $isVideo = in_array($ext, ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv']) || str_starts_with($file->getMimeType() ?: '', 'video/');
                     $folder = $isVideo ? 'videos/hero' : 'images/hero';
                     
-                    if (!file_exists(public_path($folder))) {
-                        mkdir(public_path($folder), 0755, true);
+                    if ($path = $this->storeUploadedFile($file, $folder, "slide_{$slideId}")) {
+                        $mediaUrl = $path;
+                        $mediaType = $isVideo ? 'video' : 'image';
                     }
-
-                    $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $ext;
-                    $file->move(public_path($folder), $filename);
-                    
-                    $mediaUrl = "/{$folder}/{$filename}";
-                    $mediaType = $isVideo ? 'video' : 'image';
                 }
             }
 
@@ -359,22 +415,21 @@ class SuperadminController extends Controller
         // Multi-image upload handling (supports up to 10+ images)
         $uploadedImages = [];
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                if ($file && $file->isValid()) {
-                    $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('images/news'), $filename);
-                    $uploadedImages[] = '/images/news/' . $filename;
+            $files = $request->file('images');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            foreach ($files as $file) {
+                if ($path = $this->storeUploadedFile($file, 'images/news')) {
+                    $uploadedImages[] = $path;
                 }
             }
         }
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            if ($file && $file->isValid()) {
-                $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/news'), $filename);
-                if (!in_array('/images/news/' . $filename, $uploadedImages)) {
-                    array_unshift($uploadedImages, '/images/news/' . $filename);
+            if ($path = $this->storeUploadedFile($request->file('image'), 'images/news')) {
+                if (!in_array($path, $uploadedImages)) {
+                    array_unshift($uploadedImages, $path);
                 }
             }
         } elseif ($request->filled('image') && is_string($request->input('image'))) {
@@ -431,21 +486,20 @@ class SuperadminController extends Controller
         $newUploaded = [];
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                if ($file && $file->isValid()) {
-                    $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('images/news'), $filename);
-                    $newUploaded[] = '/images/news/' . $filename;
+            $files = $request->file('images');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            foreach ($files as $file) {
+                if ($path = $this->storeUploadedFile($file, 'images/news')) {
+                    $newUploaded[] = $path;
                 }
             }
         }
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            if ($file && $file->isValid()) {
-                $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/news'), $filename);
-                array_unshift($newUploaded, '/images/news/' . $filename);
+            if ($path = $this->storeUploadedFile($request->file('image'), 'images/news')) {
+                array_unshift($newUploaded, $path);
             }
         }
 
@@ -453,6 +507,9 @@ class SuperadminController extends Controller
             $combined = array_values(array_unique(array_merge($newUploaded, $existingImages)));
             $validated['images'] = $combined;
             $validated['image'] = $combined[0];
+        } else {
+            $validated['images'] = $existingImages;
+            $validated['image'] = $news->image ?: ($existingImages[0] ?? '/images/hero/hero-automotive.jpg');
         }
 
         $news->update($validated);
@@ -515,22 +572,21 @@ class SuperadminController extends Controller
         // Multi-image upload handling for products (up to 10+ images)
         $uploadedImages = [];
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                if ($file && $file->isValid()) {
-                    $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('images/products'), $filename);
-                    $uploadedImages[] = '/images/products/' . $filename;
+            $files = $request->file('images');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            foreach ($files as $file) {
+                if ($path = $this->storeUploadedFile($file, 'images/products')) {
+                    $uploadedImages[] = $path;
                 }
             }
         }
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            if ($file && $file->isValid()) {
-                $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/products'), $filename);
-                if (!in_array('/images/products/' . $filename, $uploadedImages)) {
-                    array_unshift($uploadedImages, '/images/products/' . $filename);
+            if ($path = $this->storeUploadedFile($request->file('image'), 'images/products')) {
+                if (!in_array($path, $uploadedImages)) {
+                    array_unshift($uploadedImages, $path);
                 }
             }
         } elseif ($request->filled('image') && is_string($request->input('image'))) {
@@ -578,21 +634,20 @@ class SuperadminController extends Controller
         $newUploaded = [];
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                if ($file && $file->isValid()) {
-                    $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('images/products'), $filename);
-                    $newUploaded[] = '/images/products/' . $filename;
+            $files = $request->file('images');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            foreach ($files as $file) {
+                if ($path = $this->storeUploadedFile($file, 'images/products')) {
+                    $newUploaded[] = $path;
                 }
             }
         }
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            if ($file && $file->isValid()) {
-                $filename = time() . '_' . uniqid() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/products'), $filename);
-                array_unshift($newUploaded, '/images/products/' . $filename);
+            if ($path = $this->storeUploadedFile($request->file('image'), 'images/products')) {
+                array_unshift($newUploaded, $path);
             }
         }
 
@@ -600,6 +655,9 @@ class SuperadminController extends Controller
             $combined = array_values(array_unique(array_merge($newUploaded, $existingImages)));
             $validated['images'] = $combined;
             $validated['image'] = $combined[0];
+        } else {
+            $validated['images'] = $existingImages;
+            $validated['image'] = $product->image ?: ($existingImages[0] ?? '/images/products/product-transmission-gear.jpg');
         }
 
         $product->update($validated);
@@ -638,10 +696,8 @@ class SuperadminController extends Controller
         $validated['order'] = $validated['order'] ?? 0;
 
         if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $filename = time() . '_' . Str::slug($validated['name']) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images/bod'), $filename);
-            $validated['photo'] = '/images/bod/' . $filename;
+            $path = $this->storeUploadedFile($request->file('photo'), 'images/bod', $validated['name']);
+            $validated['photo'] = $path ?: '/images/bod/asep-nugraha.jpg';
         } elseif (!$request->filled('photo')) {
             $validated['photo'] = '/images/bod/asep-nugraha.jpg';
         }
@@ -669,10 +725,9 @@ class SuperadminController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $filename = time() . '_' . Str::slug($validated['name']) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images/bod'), $filename);
-            $validated['photo'] = '/images/bod/' . $filename;
+            if ($path = $this->storeUploadedFile($request->file('photo'), 'images/bod', $validated['name'])) {
+                $validated['photo'] = $path;
+            }
         }
 
         $director->update($validated);
