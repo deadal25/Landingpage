@@ -1,6 +1,13 @@
 <?php
 
 // Forward Vercel serverless requests to public/index.php
+// Force HTTPS headers so asset() and @vite generate https:// URLs behind reverse proxies
+$_SERVER['HTTPS'] = 'on';
+$_SERVER['SERVER_PORT'] = 443;
+if (!isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+    $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
+}
+
 // Setup writable /tmp storage and cache paths for serverless execution
 
 $tmpStorage = '/tmp/storage';

@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
     <title>@yield('title', 'PT. Musashi Auto Parts Indonesia') - Precision Monozukuri & Electric Mobility</title>
     <meta name="description" content="@yield('meta_description', 'PT. Musashi Auto Parts Indonesia (MAP-IN) is a premier manufacturer of precision two-wheel and four-wheel engine, transmission, and e-Axle electric mobility parts based in Cikarang and Karawang.')">
