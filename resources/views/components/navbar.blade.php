@@ -21,17 +21,9 @@
                     <div class="w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 flex items-center justify-center flex-shrink-0">
                         <img src="{{ asset(\App\Models\LandingPageSetting::get('navbar_logo', 'images/business/musashi-white-logo.png', false)) }}" alt="PT. Musashi Auto Parts Indonesia" class="w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 object-contain transform group-hover:scale-105 transition-transform duration-200">
                     </div>
-                    <!-- Brand Typography: 2-line break on mobile matching reference design, single line on desktop -->
-                    @php
-                        $brandTitle = \App\Models\LandingPageSetting::getForLocale('navbar_brand_title', app()->getLocale(), 'PT. Musashi Auto Parts Indonesia');
-                        $brandHtml = preg_replace(
-                            '/^(PT\.?\s+Musashi\s+Auto)\s+(Parts\s+Indonesia)$/iu',
-                            '<span class="block sm:inline">$1</span><span class="hidden sm:inline"> </span><span class="block sm:inline">$2</span>',
-                            e($brandTitle)
-                        );
-                    @endphp
-                    <span class="text-white font-bold text-xs xs:text-sm sm:text-base md:text-lg tracking-tight font-sans leading-tight">
-                        {!! $brandHtml !!}
+                    <!-- Brand Typography: Single straight line on both mobile and desktop -->
+                    <span class="text-white font-bold text-[11px] xs:text-xs sm:text-base md:text-lg tracking-tight font-sans whitespace-nowrap">
+                        {{ \App\Models\LandingPageSetting::getForLocale('navbar_brand_title', app()->getLocale(), 'PT. Musashi Auto Parts Indonesia') }}
                     </span>
                 </a>
             </div>
