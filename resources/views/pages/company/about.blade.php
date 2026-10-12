@@ -19,10 +19,10 @@
                 <span class="text-xs font-mono font-bold text-musashi-red uppercase tracking-wider">{{ \App\Models\LandingPageSetting::get('about_badge', 'Company Profile') }}</span>
             </div>
             <h1 class="text-3xl sm:text-5xl font-black text-black tracking-tight font-sans">
-                {{ \App\Models\LandingPageSetting::get('about_headline', 'About Musashi Indonesia') }}
+                {{ \App\Models\LandingPageSetting::get('about_page_title', 'About Musashi Indonesia') }}
             </h1>
             <p class="text-slate-600 text-sm sm:text-base mt-3 max-w-2xl font-normal">
-                {{ \App\Models\LandingPageSetting::get('about_sub', 'Break Barriers and Go on Adventures! Engineering world-class transmission and automotive components since 1996.') }}
+                {{ \App\Models\LandingPageSetting::get('about_page_sub', 'Break Barriers and Go on Adventures! Engineering world-class transmission and automotive components since 1996.') }}
             </p>
         </div>
     </section>

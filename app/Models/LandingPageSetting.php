@@ -35,36 +35,24 @@ class LandingPageSetting extends Model
             return $default;
         }
 
-        // 1. If locale-aware, check for localized key (e.g. hero_headline_ja)
+        // 1. If locale-aware, check for localized key (e.g. hero_headline_id, hero_headline_en, hero_headline_ja)
         $localizedKey = "{$key}_{$locale}";
         if (isset($settings[$localizedKey]) && $settings[$localizedKey] !== '' && $settings[$localizedKey] !== null) {
             return $settings[$localizedKey];
         }
 
-        // 2. If locale is Indonesian (id), check base key or _id key
-        if ($locale === 'id') {
-            if ($localeAware && isset($settings["{$key}_id"]) && $settings["{$key}_id"] !== '' && $settings["{$key}_id"] !== null) {
-                return $settings["{$key}_id"];
-            }
-            if (isset($settings[$key]) && $settings[$key] !== '' && $settings[$key] !== null) {
-                return $settings[$key];
-            }
-        }
-
-        // 3. For non-Indonesian locales (en, ja), if a translated $default was passed, prefer it!
-        if ($default !== null) {
-            return $default;
-        }
-
-        // 4. Fallback to general key or default
+        // 2. Check base key (without locale suffix)
         if (isset($settings[$key]) && $settings[$key] !== '' && $settings[$key] !== null) {
             return $settings[$key];
         }
 
-        if ($localeAware && isset($settings["{$key}_id"]) && $settings["{$key}_id"] !== '' && $settings["{$key}_id"] !== null) {
-            return $settings["{$key}_id"];
+        // 3. Check Indonesian default key (_id), as primary locale configured in Superadmin
+        $idKey = "{$key}_id";
+        if (isset($settings[$idKey]) && $settings[$idKey] !== '' && $settings[$idKey] !== null) {
+            return $settings[$idKey];
         }
 
+        // 4. Fallback to default
         return $default;
     }
 
@@ -80,21 +68,20 @@ class LandingPageSetting extends Model
             return $settings[$localizedKey];
         }
 
-        if ($locale === 'id') {
-            if (isset($settings["{$key}_id"]) && $settings["{$key}_id"] !== '' && $settings["{$key}_id"] !== null) {
-                return $settings["{$key}_id"];
-            }
-            if (isset($settings[$key]) && $settings[$key] !== '' && $settings[$key] !== null) {
-                return $settings[$key];
-            }
+        if (isset($settings[$key]) && $settings[$key] !== '' && $settings[$key] !== null) {
+            return $settings[$key];
+        }
+
+        if ($locale === 'id' && isset($settings["{$key}_id"]) && $settings["{$key}_id"] !== '' && $settings["{$key}_id"] !== null) {
+            return $settings["{$key}_id"];
         }
 
         if ($default !== null) {
             return $default;
         }
 
-        if (isset($settings[$key]) && $settings[$key] !== '' && $settings[$key] !== null) {
-            return $settings[$key];
+        if (isset($settings["{$key}_id"]) && $settings["{$key}_id"] !== '' && $settings["{$key}_id"] !== null) {
+            return $settings["{$key}_id"];
         }
 
         return $default;

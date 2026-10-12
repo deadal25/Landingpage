@@ -315,6 +315,12 @@ class SuperadminController extends Controller
 
         foreach ($data as $key => $value) {
             LandingPageSetting::set($key, $value);
+
+            // Synchronize base key when saving Indonesian (_id) primary settings
+            if (str_ends_with($key, '_id')) {
+                $baseKey = substr($key, 0, -3);
+                LandingPageSetting::set($baseKey, $value);
+            }
         }
 
         LandingPageSetting::clearCache();

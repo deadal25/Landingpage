@@ -75,7 +75,9 @@
               phone: '',
               scope: '',
               stats: ''
-          }
+          },
+          companyCard1Title: @js(\App\Models\LandingPageSetting::getForLocale('company_card1_title', $editLocale, __('messages.nav.about_us'))),
+          companyCard1Desc: @js(\App\Models\LandingPageSetting::getForLocale('company_card1_desc', $editLocale, 'Profil lengkap PT Musashi Auto Parts Indonesia, sejarah pendirian, pabrik Cikarang & Karawang, serta sinergi Monozukuri terpadu.'))
       }">
 
     <!-- Mobile Sidebar Backdrop Overlay -->
@@ -1518,7 +1520,7 @@
                                 <div class="xl:col-span-7 space-y-4">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Header Banner</label>
+                                            <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Header Banner Atas</label>
                                             <input type="text" name="about_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_badge', $editLocale, 'Company Profile') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
                                         </div>
                                         <div>
@@ -1527,8 +1529,21 @@
                                         </div>
                                     </div>
 
+                                    <!-- Judul Utama Banner H1 & Sub-Judul -->
+                                    <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-3">
+                                        <div>
+                                            <label class="text-[11px] font-mono text-slate-800 uppercase block mb-1 font-bold">Judul Utama Halaman / Banner Atas (H1)</label>
+                                            <input type="text" name="about_page_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_page_title', $editLocale, 'About Musashi Indonesia') }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-extrabold focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="text-[11px] font-mono text-slate-800 uppercase block mb-1 font-bold">Sub-Judul Teks Banner Atas</label>
+                                            <textarea name="about_page_sub_{{ $editLocale }}" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs text-black leading-relaxed focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none">{{ \App\Models\LandingPageSetting::getForLocale('about_page_sub', $editLocale, 'Break Barriers and Go on Adventures! Engineering world-class transmission and automotive components since 1996.') }}</textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Headline Identitas Korporat H2 & Filosofi -->
                                     <div>
-                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Headline Profil</label>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Headline Utama Identitas Korporat (H2)</label>
                                         <input type="text" name="about_headline_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_headline', $editLocale, 'Break Barriers and Go on Adventures!') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
                                     </div>
                                     <div>
@@ -1966,6 +1981,46 @@
                                                 <input type="text" x-model="plant2Tag" name="outline_plant2_tag_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none font-semibold">
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1D. Kartu Cuplikan 'About Us' di Halaman Depan / Beranda (#company) -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                            <div>
+                                <span class="text-xs font-mono font-bold text-slate-800 block uppercase">📌 Kartu Cuplikan "About Us" di Beranda Depan (#company)</span>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Teks pada kartu pertama di seksi Profil Perusahaan pada halaman utama (Landing Page #company).</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white text-slate-700 border border-slate-200 shadow-xs hidden sm:inline-flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-musashi-red"></span>
+                                <span>Tampil di Beranda</span>
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                            <div class="lg:col-span-7 space-y-4">
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Kartu di Beranda Depan</label>
+                                    <input type="text" x-model="companyCard1Title" name="company_card1_title_{{ $editLocale }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Deskripsi Cuplikan Singkat</label>
+                                    <textarea x-model="companyCard1Desc" name="company_card1_desc_{{ $editLocale }}" rows="3" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black leading-relaxed focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs"></textarea>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-5 space-y-2">
+                                <span class="text-[10px] font-mono uppercase font-bold text-slate-500 block">Preview Kartu di Beranda:</span>
+                                <div class="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-3">
+                                    <div class="w-9 h-9 rounded-xl bg-red-50 text-musashi-red flex items-center justify-center">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    </div>
+                                    <h4 class="text-sm font-bold text-slate-900" x-text="companyCard1Title || 'About Us'"></h4>
+                                    <p class="text-slate-600 text-[11px] leading-relaxed" x-text="companyCard1Desc || 'Profil lengkap PT Musashi Auto Parts Indonesia...'"></p>
+                                    <div class="pt-2 border-t border-slate-100 flex items-center text-[10px] font-mono font-bold text-musashi-red uppercase gap-1">
+                                        <span>Read More →</span>
                                     </div>
                                 </div>
                             </div>
@@ -2684,11 +2739,11 @@
                                 <span class="text-[10px] font-mono font-bold text-musashi-red uppercase block">Kartu 1: About Us</span>
                                 <div>
                                     <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-1">Judul Kartu</label>
-                                    <input type="text" name="company_card1_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('company_card1_title', $editLocale, __('messages.nav.about_us')) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                    <input type="text" x-model="companyCard1Title" name="company_card1_title_{{ $editLocale }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
                                 </div>
                                 <div>
                                     <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-1">Deskripsi Singkat</label>
-                                    <textarea name="company_card1_desc_{{ $editLocale }}" rows="2" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">{{ \App\Models\LandingPageSetting::getForLocale('company_card1_desc', $editLocale, 'Profil lengkap PT Musashi Auto Parts Indonesia, sejarah pendirian, pabrik Cikarang & Karawang, serta sinergi Monozukuri terpadu.') }}</textarea>
+                                    <textarea x-model="companyCard1Desc" name="company_card1_desc_{{ $editLocale }}" rows="2" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black"></textarea>
                                 </div>
                             </div>
 
