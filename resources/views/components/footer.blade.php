@@ -1,8 +1,8 @@
-<footer class="bg-black text-white font-sans pt-12 sm:pt-14 pb-12 relative overflow-hidden" x-data="{}">
+<footer class="bg-black text-white font-sans pt-10 sm:pt-12 pb-5 sm:pb-6 relative overflow-hidden" x-data="{}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Main Top Content Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-white/10">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-6 sm:pb-7 border-b border-white/10">
             
             <!-- Left Column: Logo + Company Name + Address matching Image 1 -->
             <div class="md:col-span-6 lg:col-span-6 space-y-3">
@@ -71,11 +71,11 @@
 
         </div>
 
-        <!-- Bottom Row matching Image: Follow us, Copyright, and Scroll-to-top button -->
-        <div class="pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <!-- Bottom Row: Follow us, Copyright, and Scroll-to-top button -->
+        <div class="pt-4 sm:pt-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
             
             <!-- Left: Follow us -->
-            <div class="text-xs sm:text-sm text-white/90 pl-14 sm:pl-16 md:pl-20 2xl:pl-0">
+            <div class="text-xs sm:text-sm text-white/90">
                 <div class="flex items-center gap-3">
                     <span class="font-normal text-white">Follow us :</span>
                     <!-- YouTube -->
@@ -107,9 +107,9 @@
                 <button 
                     @click="window.scrollTo({ top: 0, behavior: 'smooth' })" 
                     type="button" 
-                    class="w-11 h-11 rounded-full border border-white/60 hover:border-white text-white flex items-center justify-center hover:bg-white/15 transition-all shadow-lg focus:outline-none group cursor-pointer"
+                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-white/60 hover:border-white text-white flex items-center justify-center hover:bg-white/15 transition-all shadow-md focus:outline-none group cursor-pointer"
                     aria-label="Scroll to top">
-                    <svg class="w-5 h-5 text-white stroke-[2.5] transform group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-white stroke-[2.5] transform group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
                     </svg>
                 </button>
