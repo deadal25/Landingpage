@@ -6,4 +6,5 @@
 .phpunit.result.cache
 tests
 node_modules
+vendor
 *.log
