@@ -267,8 +267,8 @@
     <div class="lg:pl-64 flex-1 flex flex-col min-h-screen">
         
         <!-- Top Sticky Header -->
-        <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 xs:px-4 sm:px-8 py-3 flex items-center justify-between gap-2 sm:gap-4 shadow-2xs">
-            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 xs:px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4 shadow-2xs">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <!-- Hamburger Button (Mobile) -->
                 <button 
                     @click="sidebarOpen = !sidebarOpen" 
@@ -278,43 +278,43 @@
                     <svg class="w-5 h-5 xs:w-6 xs:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
 
-                <!-- Breadcrumb with responsive truncate -->
-                <div class="min-w-0">
-                    <h2 class="text-xs xs:text-sm sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-1.5 sm:gap-2 truncate max-w-[120px] xs:max-w-[180px] sm:max-w-none">
-                        <span x-show="currentTab === 'overview'">📊 {{ $L('tab_overview') }}</span>
-                        <span x-show="currentTab === 'navbar'">🧭 {{ $L('tab_navbar') }}</span>
-                        <span x-show="currentTab === 'hero'">🎬 {{ $L('tab_hero') }}</span>
-                        <span x-show="currentTab === 'news'">📰 {{ $L('tab_news') }}</span>
-                        <span x-show="currentTab === 'pillars'">🌐 {{ $L('tab_pillars') }}</span>
-                        <span x-show="currentTab === 'products'">⚙️ {{ $L('tab_products') }}</span>
-                        <span x-show="currentTab === 'technology'">🔬 {{ $L('tab_technology') }}</span>
-                        <span x-show="currentTab === 'profile'">🏢 {{ $L('tab_profile') }}</span>
-                        <span x-show="currentTab === 'directors'">👥 {{ $L('tab_directors') }}</span>
-                        <span x-show="currentTab === 'sustainability'">🌱 {{ $L('tab_sustainability') }}</span>
-                        <span x-show="currentTab === 'footer'">📌 {{ $L('tab_footer') }}</span>
+                <!-- Full Page Title without truncation -->
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-xs xs:text-sm sm:text-base md:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-1.5 sm:gap-2 leading-tight">
+                        <span x-show="currentTab === 'overview'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">📊 {{ $L('tab_overview') }}</span>
+                        <span x-show="currentTab === 'navbar'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">🧭 {{ $L('tab_navbar') }}</span>
+                        <span x-show="currentTab === 'hero'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">🎬 {{ $L('tab_hero') }}</span>
+                        <span x-show="currentTab === 'news'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">📰 {{ $L('tab_news') }}</span>
+                        <span x-show="currentTab === 'pillars'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">🌐 {{ $L('tab_pillars') }}</span>
+                        <span x-show="currentTab === 'products'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">⚙️ {{ $L('tab_products') }}</span>
+                        <span x-show="currentTab === 'technology'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">🔬 {{ $L('tab_technology') }}</span>
+                        <span x-show="currentTab === 'profile'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">🏢 {{ $L('tab_profile') }}</span>
+                        <span x-show="currentTab === 'directors'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">👥 {{ $L('tab_directors') }}</span>
+                        <span x-show="currentTab === 'sustainability'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">🌱 {{ $L('tab_sustainability') }}</span>
+                        <span x-show="currentTab === 'footer'" class="inline-flex items-center gap-1.5 whitespace-normal sm:whitespace-nowrap">📌 {{ $L('tab_footer') }}</span>
                     </h2>
-                    <p class="text-[11px] text-slate-500 hidden sm:block truncate">{{ $L('live_note') }}</p>
+                    <p class="text-[11px] text-slate-500 hidden md:block">{{ $L('live_note') }}</p>
                 </div>
             </div>
 
             <!-- Top Right Bar (Clean language switcher, view web button, admin badge) -->
-            <div class="flex items-center gap-1.5 xs:gap-2.5 sm:gap-4 flex-shrink-0">
+            <div class="flex items-center gap-1.5 xs:gap-2 sm:gap-3 flex-shrink-0">
                 
                 <!-- Language Selector for Superadmin (ID / EN / JP) -->
-                <div class="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5 sm:p-1 text-[11px] sm:text-xs font-mono font-bold flex-shrink-0">
+                <div class="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5 sm:p-1 text-[10px] xs:text-[11px] sm:text-xs font-mono font-bold flex-shrink-0">
                     <a href="{{ route('superadmin.index', ['tab' => $activeTab, 'lang' => 'id']) }}"
                        title="Edit Konten Bahasa Indonesia"
-                       class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg transition-all {{ $editLocale === 'id' ? 'bg-musashi-red text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-black hover:bg-white/70' }}">
+                       class="px-1.5 xs:px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg transition-all {{ $editLocale === 'id' ? 'bg-musashi-red text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-black hover:bg-white/70' }}">
                         ID
                     </a>
                     <a href="{{ route('superadmin.index', ['tab' => $activeTab, 'lang' => 'en']) }}"
                        title="Edit Konten Bahasa Inggris"
-                       class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg transition-all {{ $editLocale === 'en' ? 'bg-musashi-red text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-black hover:bg-white/70' }}">
+                       class="px-1.5 xs:px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg transition-all {{ $editLocale === 'en' ? 'bg-musashi-red text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-black hover:bg-white/70' }}">
                         EN
                     </a>
                     <a href="{{ route('superadmin.index', ['tab' => $activeTab, 'lang' => 'ja']) }}"
                        title="Edit Konten Bahasa Jepang"
-                       class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg transition-all {{ $editLocale === 'ja' ? 'bg-musashi-red text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-black hover:bg-white/70' }}">
+                       class="px-1.5 xs:px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg transition-all {{ $editLocale === 'ja' ? 'bg-musashi-red text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-black hover:bg-white/70' }}">
                         JP
                     </a>
                 </div>
@@ -323,16 +323,16 @@
                 <a href="{{ route('locale.switch', $editLocale) }}" target="_blank"
                    title="Buka Website Landing Page"
                    class="inline-flex items-center gap-1.5 px-2 xs:px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-colors shadow-2xs flex-shrink-0">
-                    <span class="hidden sm:inline">{{ $L('view_web') }}</span>
+                    <span class="hidden md:inline">{{ $L('view_web') }}</span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>
 
                 <!-- Admin Badge (Musashi Admin) -->
-                <div class="hidden xs:flex items-center gap-2 pl-1.5 sm:pl-2 border-l border-slate-200 flex-shrink-0">
+                <div class="hidden sm:flex items-center gap-2 pl-1.5 sm:pl-2 border-l border-slate-200 flex-shrink-0">
                     <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-50 text-musashi-red border border-red-200 flex items-center justify-center font-bold text-xs flex-shrink-0">
                         A
                     </div>
-                    <div class="text-left hidden md:block">
+                    <div class="text-left hidden lg:block">
                         <span class="text-xs font-bold text-slate-900 block leading-tight">Musashi Admin</span>
                         <span class="text-[10px] text-slate-400 font-mono block">admin@musashi.co.id</span>
                     </div>
