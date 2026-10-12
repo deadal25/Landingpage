@@ -301,6 +301,214 @@ class LandingPageSetting extends Model
     }
 
     /**
+     * Default Global & Domestic Network facilities.
+     */
+    public static function defaultNetworkFacilities(): array
+    {
+        return [
+            [
+                'id' => 'cikarang',
+                'region' => 'indonesia',
+                'badge' => 'Plant 1 - Head Office',
+                'est' => 'Established Jan 1996',
+                'name' => 'PT Musashi Auto Parts Indonesia - Cikarang',
+                'address' => 'EJIP Industrial Park Plot 3J-2 Cikarang Selatan, Bekasi 17550, West Java, Indonesia',
+                'phone' => '+62-21-8970866',
+                'scope' => '2W & 4W Transmission Gear, Shaft, Camshaft, AT Mission',
+                'stats' => 'Land Area: 55,000 m² • Workforce: 1,194 Persons',
+            ],
+            [
+                'id' => 'karawang',
+                'region' => 'indonesia',
+                'badge' => 'Plant 2 - Mass Production',
+                'est' => 'Established Jan 2006',
+                'name' => 'PT Musashi Auto Parts Indonesia - Karawang',
+                'address' => 'Suryacipta City of Industry Jl. Surya Madya Kav 1-36 BC, Desa Kutanegara Kec. Ciampel, Karawang 41361, Indonesia',
+                'phone' => '+62-21-89115116',
+                'scope' => 'Heavy Forging, Differential Assembly, Ball Joint Assembly',
+                'stats' => 'Land Area: 60,000 m² • Workforce: 443 Persons',
+            ],
+            [
+                'id' => 'jp_ueta',
+                'region' => 'japan',
+                'badge' => 'Global HQ / Aichi',
+                'est' => '',
+                'name' => 'Head Office / Ueta Plant',
+                'address' => '39-5 Daizen, Ueta-cho, Toyohashi-shi, Aichi',
+                'phone' => '(+81)532-25-8111',
+                'scope' => 'Global Operations, R&D, Transmission Gears',
+                'stats' => '',
+            ],
+            [
+                'id' => 'jp_akemi',
+                'region' => 'japan',
+                'badge' => 'Aichi Production',
+                'est' => '',
+                'name' => 'Akemi Plants #1 & #2',
+                'address' => '2-18 & 3-29 Akemi-cho, Toyohashi-shi, Aichi',
+                'phone' => '(+81)532-25-3111',
+                'scope' => 'Mass Production Forging & Precision Machining',
+                'stats' => '',
+            ],
+            [
+                'id' => 'jp_energy',
+                'region' => 'japan',
+                'badge' => 'Energy Solutions',
+                'est' => '',
+                'name' => 'Musashi Energy Solutions Co., Ltd.',
+                'address' => '8565 Nishiide, Oizumi-cho, Hokuto-shi, Yamanashi',
+                'phone' => '(+81)551-38-8008',
+                'scope' => 'Hybrid Super Capacitor, Energy Storage Devices',
+                'stats' => '',
+            ],
+            [
+                'id' => 'jp_suzuka',
+                'region' => 'japan',
+                'badge' => 'Mie Plant',
+                'est' => '',
+                'name' => 'Suzuka Plant',
+                'address' => '393-12-16 Oike, Suzuka-shi, Mie',
+                'phone' => '(+81)59-378-0621',
+                'scope' => 'Motorcycle & Automotive Drivetrain Parts',
+                'stats' => '',
+            ],
+            [
+                'id' => 'jp_kyushu',
+                'region' => 'japan',
+                'badge' => 'Kyushu',
+                'est' => '',
+                'name' => 'Kyushu Musashi Seimitsu Co., Ltd.',
+                'address' => '2605-7 Karimasashita, Ichibu, Nishiki-machi, Kumamoto',
+                'phone' => '(+81)966-38-2121',
+                'scope' => 'Precision Machining & Assembly',
+                'stats' => '',
+            ],
+            [
+                'id' => 'jp_casting',
+                'region' => 'japan',
+                'badge' => 'Precision Casting',
+                'est' => '',
+                'name' => 'Musashi Casting Co., Ltd.',
+                'address' => '2-3 Miwachomiwa, Fukuchiyama-shi, Kyoto',
+                'phone' => '(+81)773-59-2433',
+                'scope' => 'Iron & Aluminum Casting Facilities',
+                'stats' => '',
+            ],
+            [
+                'id' => 'eu_germany',
+                'region' => 'europe',
+                'badge' => 'Germany HQ',
+                'est' => '',
+                'name' => 'Musashi Europe GmbH',
+                'address' => 'Haystrasse 7-13, 55566 Bad Sobernheim, Germany',
+                'phone' => '+49-6751-83-0',
+                'scope' => 'European Operations, Engineering & Forging',
+                'stats' => '',
+            ],
+            [
+                'id' => 'eu_hungary',
+                'region' => 'europe',
+                'badge' => 'Hungary',
+                'est' => '',
+                'name' => 'Musashi Hungary Manufacturing, Ltd.',
+                'address' => '2451 Ercsi, Ercseny Ut 1, Hungary',
+                'phone' => '+36-25-551-801',
+                'scope' => 'Automotive Powertrain Precision Components',
+                'stats' => '',
+            ],
+            [
+                'id' => 'eu_uk',
+                'region' => 'europe',
+                'badge' => 'United Kingdom',
+                'est' => '',
+                'name' => 'Musashi Auto Parts UK Ltd.',
+                'address' => '6 Hawtin Park Gellihaf Pontllanfraith, Blackwood, UK',
+                'phone' => '+44-1443-866-100',
+                'scope' => 'Chassis & Suspension Linkage Components',
+                'stats' => '',
+            ],
+            [
+                'id' => 'eu_spain',
+                'region' => 'europe',
+                'badge' => 'Spain',
+                'est' => '',
+                'name' => 'Musashi Spain Villalba S.L.',
+                'address' => 'Camino del Molino n°5, Collado Villalba (Madrid), Spain',
+                'phone' => '+34-91-856-1482',
+                'scope' => 'Machining & Assembly Operations',
+                'stats' => '',
+            ],
+            [
+                'id' => 'as_china',
+                'region' => 'asia',
+                'badge' => 'China',
+                'est' => '',
+                'name' => 'Musashi Auto Parts (Zhongshan) Co., Ltd.',
+                'address' => 'Torch Hi-tech Industrial Development Zone, Zhongshan, Guangdong',
+                'phone' => '+86-760-8829-1111',
+                'scope' => 'Transmission Gears & Camshafts for Asian Markets',
+                'stats' => '',
+            ],
+            [
+                'id' => 'as_thailand',
+                'region' => 'asia',
+                'badge' => 'Thailand',
+                'est' => '',
+                'name' => 'Musashi Auto Parts (Thailand) Co., Ltd.',
+                'address' => '7/230 Moo 6, Tambol Mabyangporn, Pluakdaeng, Rayong',
+                'phone' => '+66-38-891-311',
+                'scope' => '2W/4W Powertrain Production Hub',
+                'stats' => '',
+            ],
+            [
+                'id' => 'as_india',
+                'region' => 'asia',
+                'badge' => 'India',
+                'est' => '',
+                'name' => 'Musashi Auto Parts India Pvt. Ltd.',
+                'address' => 'Plot No. 40, Sector 7, IIE Pantnagar, Rudrapur, Uttarakhand',
+                'phone' => '+91-5944-250-400',
+                'scope' => 'EV Powertrain & Transmission Systems',
+                'stats' => '',
+            ],
+            [
+                'id' => 'am_usa',
+                'region' => 'asia',
+                'badge' => 'USA',
+                'est' => '',
+                'name' => 'Musashi Auto Parts Michigan, Inc.',
+                'address' => '195 Concord Road, Battle Creek, Michigan, USA',
+                'phone' => '+1-269-965-0100',
+                'scope' => 'North America Drivetrain Assembly & EV E-Axle',
+                'stats' => '',
+            ],
+        ];
+    }
+
+    /**
+     * Get list of Global & Domestic Network facilities.
+     */
+    public static function getNetworkFacilities(): array
+    {
+        $raw = static::get('network_facilities_data', null, false);
+        if ($raw) {
+            $decoded = is_string($raw) ? json_decode($raw, true) : $raw;
+            if (is_array($decoded) && !empty($decoded)) {
+                return array_values($decoded);
+            }
+        }
+        return static::defaultNetworkFacilities();
+    }
+
+    /**
+     * Save Global & Domestic Network facilities.
+     */
+    public static function saveNetworkFacilities(array $facilities): void
+    {
+        static::set('network_facilities_data', json_encode(array_values($facilities)), 'company', 'json');
+    }
+
+    /**
      * Clear settings cache.
      */
     public static function clearCache(): void

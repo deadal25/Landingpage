@@ -298,6 +298,14 @@ class SuperadminController extends Controller
             unset($data[$fileKey]);
         }
 
+        if ($request->has('network_facilities_json')) {
+            $rawFac = json_decode($request->input('network_facilities_json', '[]'), true);
+            if (is_array($rawFac)) {
+                LandingPageSetting::saveNetworkFacilities($rawFac);
+            }
+            unset($data['network_facilities_json']);
+        }
+
         foreach ($data as $key => $value) {
             LandingPageSetting::set($key, $value);
         }

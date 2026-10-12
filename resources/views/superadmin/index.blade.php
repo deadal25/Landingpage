@@ -60,7 +60,20 @@
           editingDirector: null,
           createNewsPhotos: [],
           editNewPhotos: [],
-          isCompressingPhotos: false
+          isCompressingPhotos: false,
+          networkFacilities: {{ json_encode(\App\Models\LandingPageSetting::getNetworkFacilities()) }},
+          networkRegionFilter: 'all',
+          showAddFacilityModal: false,
+          newFacility: {
+              region: 'indonesia',
+              badge: '',
+              name: '',
+              est: '',
+              address: '',
+              phone: '',
+              scope: '',
+              stats: ''
+          }
       }">
 
     <!-- Mobile Sidebar Backdrop Overlay -->
@@ -1351,17 +1364,17 @@
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-red-100 text-musashi-red border border-red-200">
                                     Bahasa Aktif: {{ strtoupper($editLocale) }}
                                 </span>
-                                <span class="text-xs text-slate-400 font-mono">(6 Modul Profil Perusahaan)</span>
+                                <span class="text-xs text-slate-400 font-mono">(7 Modul Profil Perusahaan)</span>
                             </div>
                             <h3 class="text-lg font-extrabold text-slate-900">Pusat Pengaturan Profil Perusahaan (Company Profile Hub)</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Kelola seluruh 6 bagian profil perusahaan mulai dari Tentang Kami, Pesan Korporat, Filosofi, Visi 2038, Garis Besar, hingga Dewan Direksi.</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola seluruh 7 bagian profil perusahaan mulai dari Tentang Kami, Pesan Korporat, Filosofi, Visi 2038, Garis Besar, Dewan Direksi, hingga Jaringan Global.</p>
                         </div>
                         <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-musashi-red hover:bg-musashi-darkred shadow-sm cursor-pointer flex items-center gap-2">
                             <span>💾 Simpan Semua Profil</span>
                         </button>
                     </div>
 
-                    <!-- 6-Section Interactive Sub-Tab Navigator -->
+                    <!-- 7-Section Interactive Sub-Tab Navigator -->
                     <div class="bg-white p-2 sm:p-2.5 rounded-2xl border border-slate-200 shadow-xs sticky top-20 z-30 backdrop-blur-md bg-white/95">
                         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-thin">
                             <!-- SubTab 1: About Us -->
@@ -1410,6 +1423,14 @@
                                     :class="profileSubTab === 'directors' ? 'bg-musashi-red text-white shadow-xs font-bold' : 'text-slate-600 hover:text-black hover:bg-slate-100 font-semibold'" 
                                     class="px-3.5 py-2.5 rounded-xl text-xs whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer flex-shrink-0">
                                 <span>👥 6. Board of Directors & Kartu</span>
+                            </button>
+
+                            <!-- SubTab 7: Jaringan Global (Network) -->
+                            <button type="button" 
+                                    @click="profileSubTab = 'network'" 
+                                    :class="profileSubTab === 'network' ? 'bg-musashi-red text-white shadow-xs font-bold' : 'text-slate-600 hover:text-black hover:bg-slate-100 font-semibold'" 
+                                    class="px-3.5 py-2.5 rounded-xl text-xs whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer flex-shrink-0">
+                                <span>🌐 7. Jaringan Global (Network)</span>
                             </button>
 
                             <!-- All Option -->
@@ -2348,6 +2369,360 @@
                             <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                                 <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-musashi-red hover:bg-musashi-darkred shadow-sm cursor-pointer flex items-center gap-1.5">
                                     <span>💾 Simpan Direksi & Kartu Profil</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUB-TAB 7: JARINGAN GLOBAL (GLOBAL NETWORK)    -->
+                    <!-- ============================================== -->
+                    <div x-show="profileSubTab === 'network' || profileSubTab === 'all'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+                        
+                        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+                            
+                            <!-- Header Title Box -->
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-musashi-red"></span>
+                                    <h4 class="font-extrabold text-sm text-slate-900 uppercase font-mono">7. Jaringan Global & Domestik (Global & Domestic Network)</h4>
+                                </div>
+                                <span class="text-[10px] font-mono text-slate-400">Tampil di Halaman /company/network & Kartu Landing Page #company-network</span>
+                            </div>
+
+                            <!-- 7A. Pengaturan Kartu di Landing Page (#company-network) -->
+                            <div class="p-5 rounded-2xl bg-gradient-to-br from-red-50/60 to-slate-50 border border-red-200/80 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-mono font-bold text-musashi-red uppercase flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-musashi-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>
+                                        <span>7A. Tampilan Kartu Jaringan Global di Landing Page (#company-network)</span>
+                                    </span>
+                                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-100 text-musashi-red font-bold">Kartu #7 Landing Page</span>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Kartu (#company-network)</label>
+                                        <input type="text" name="company_card7_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('company_card7_title', $editLocale, __('messages.nav.network')) }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Teks Tombol Link Kartu</label>
+                                        <input type="text" name="company_card7_btn_text_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('company_card7_btn_text', $editLocale, __('messages.common.read_more')) }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Deskripsi Ringkasan Kartu di Landing Page</label>
+                                    <textarea name="company_card7_desc_{{ $editLocale }}" rows="2" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black leading-relaxed">{{ \App\Models\LandingPageSetting::getForLocale('company_card7_desc', $editLocale, 'Dua pabrik utama di Cikarang (Head Office) dan Karawang Plant, terkoneksi dengan lebih dari 30 fasilitas global Musashi Group di seluruh dunia.') }}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- 7B. Header Banner Halaman Lengkap (/company/network) -->
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                                <span class="text-xs font-mono font-bold text-musashi-red uppercase block">
+                                    🏷️ 7B. Header Banner Halaman Jaringan Global (/company/network)
+                                </span>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Header Banner</label>
+                                        <input type="text" name="network_hero_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_hero_badge', $editLocale, 'Global Operations') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Utama Halaman (H1)</label>
+                                        <input type="text" name="network_hero_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_hero_title', $editLocale, 'Global & Domestic Network') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-bold">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Deskripsi Sub-Headline Halaman</label>
+                                    <textarea name="network_hero_desc_{{ $editLocale }}" rows="2" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black leading-relaxed">{{ \App\Models\LandingPageSetting::getForLocale('network_hero_desc', $editLocale, 'A connected ecosystem of 35 production plants in 14 countries delivering uniform precision and localized supply assurance.') }}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- 7C. Judul Sub-Wilayah (4 Tab Wilayah) -->
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                                <span class="text-xs font-mono font-bold text-musashi-red uppercase block">
+                                    🌐 7C. Judul & Subtitle 4 Wilayah Jaringan
+                                </span>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Indonesia -->
+                                    <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-mono font-bold text-musashi-red uppercase block">🇮🇩 Wilayah 1: Indonesia</span>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Badge / Sub-judul</label>
+                                            <input type="text" name="network_indo_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_indo_badge', $editLocale, 'Domestic Production Network') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Judul Wilayah</label>
+                                            <input type="text" name="network_indo_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_indo_title', $editLocale, 'Indonesia Operating Plants') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-semibold">
+                                        </div>
+                                    </div>
+
+                                    <!-- Japan -->
+                                    <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-mono font-bold text-musashi-red uppercase block">🇯🇵 Wilayah 2: Japan (HQ)</span>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Badge / Sub-judul</label>
+                                            <input type="text" name="network_japan_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_japan_badge', $editLocale, 'Global Headquarters & Japanese Facilities') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Judul Wilayah</label>
+                                            <input type="text" name="network_japan_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_japan_title', $editLocale, 'Japan Network') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-semibold">
+                                        </div>
+                                    </div>
+
+                                    <!-- Europe -->
+                                    <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-mono font-bold text-musashi-red uppercase block">🇪🇺 Wilayah 3: Europe</span>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Badge / Sub-judul</label>
+                                            <input type="text" name="network_europe_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_europe_badge', $editLocale, 'European Manufacturing') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Judul Wilayah</label>
+                                            <input type="text" name="network_europe_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_europe_title', $editLocale, 'Europe Network') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-semibold">
+                                        </div>
+                                    </div>
+
+                                    <!-- Asia & Americas -->
+                                    <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-mono font-bold text-musashi-red uppercase block">🌏 Wilayah 4: Asia & Americas</span>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Badge / Sub-judul</label>
+                                            <input type="text" name="network_asia_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_asia_badge', $editLocale, 'Global Reach') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Judul Wilayah</label>
+                                            <input type="text" name="network_asia_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('network_asia_title', $editLocale, 'Asia & The Americas') }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-semibold">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 7D. Manajemen Fasilitas Pabrik (Lengkap Tambah, Edit, Hapus) -->
+                            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-5">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                                    <div>
+                                        <span class="text-xs font-mono font-bold text-musashi-red uppercase block">
+                                            🏭 7D. Daftar Fasilitas & Pabrik Global (Bisa Edit, Tambah & Hapus)
+                                        </span>
+                                        <span class="text-[11px] text-slate-500 mt-0.5 block">
+                                            Total <strong class="text-black" x-text="networkFacilities.length"></strong> fasilitas pabrik terdaftar. Anda dapat mengubah teks, menghapus, atau menambahkan fasilitas baru.
+                                        </span>
+                                    </div>
+
+                                    <!-- Tombol Tambah Fasilitas Baru -->
+                                    <button type="button" 
+                                            @click="showAddFacilityModal = true"
+                                            class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-musashi-red hover:bg-musashi-darkred shadow-sm transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        <span>+ Tambah Pabrik / Fasilitas</span>
+                                    </button>
+                                </div>
+
+                                <!-- Filter Tab Wilayah -->
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-[11px] font-mono text-slate-500 font-bold mr-1">Filter Wilayah:</span>
+                                    <button type="button" 
+                                            @click="networkRegionFilter = 'all'"
+                                            :class="networkRegionFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                                            class="px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-colors cursor-pointer">
+                                        Semua (<span x-text="networkFacilities.length"></span>)
+                                    </button>
+                                    <button type="button" 
+                                            @click="networkRegionFilter = 'indonesia'"
+                                            :class="networkRegionFilter === 'indonesia' ? 'bg-musashi-red text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                                            class="px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-colors cursor-pointer">
+                                        Indonesia (<span x-text="networkFacilities.filter(f => f.region === 'indonesia').length"></span>)
+                                    </button>
+                                    <button type="button" 
+                                            @click="networkRegionFilter = 'japan'"
+                                            :class="networkRegionFilter === 'japan' ? 'bg-musashi-red text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                                            class="px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-colors cursor-pointer">
+                                        Japan (<span x-text="networkFacilities.filter(f => f.region === 'japan').length"></span>)
+                                    </button>
+                                    <button type="button" 
+                                            @click="networkRegionFilter = 'europe'"
+                                            :class="networkRegionFilter === 'europe' ? 'bg-musashi-red text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                                            class="px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-colors cursor-pointer">
+                                        Europe (<span x-text="networkFacilities.filter(f => f.region === 'europe').length"></span>)
+                                    </button>
+                                    <button type="button" 
+                                            @click="networkRegionFilter = 'asia'"
+                                            :class="networkRegionFilter === 'asia' ? 'bg-musashi-red text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                                            class="px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-colors cursor-pointer">
+                                        Asia & Americas (<span x-text="networkFacilities.filter(f => f.region === 'asia').length"></span>)
+                                    </button>
+                                </div>
+
+                                <!-- Hidden input yang dikirim ke backend -->
+                                <input type="hidden" name="network_facilities_json" :value="JSON.stringify(networkFacilities)">
+
+                                <!-- Daftar Kartu Fasilitas yang Bisa Diedit & Dihapus -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    <template x-for="(fac, fIdx) in networkFacilities" :key="fac.id || fIdx">
+                                        <div x-show="networkRegionFilter === 'all' || networkRegionFilter === fac.region" 
+                                             class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-musashi-red/40 hover:shadow-sm transition-all space-y-3 relative group">
+                                            
+                                            <!-- Top Card Bar: Region + Hapus Button -->
+                                            <div class="flex items-center justify-between gap-2">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="w-5 h-5 rounded-md bg-slate-900 text-white font-mono text-[10px] font-bold flex items-center justify-center" x-text="'#' + (fIdx + 1)"></span>
+                                                    <select x-model="fac.region" class="text-[11px] font-mono font-bold bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800">
+                                                        <option value="indonesia">🇮🇩 Indonesia</option>
+                                                        <option value="japan">🇯🇵 Japan (HQ)</option>
+                                                        <option value="europe">🇪🇺 Europe</option>
+                                                        <option value="asia">🌏 Asia & Americas</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Tombol Hapus Fasilitas -->
+                                                <button type="button" 
+                                                        @click="if(confirm('Yakin ingin menghapus fasilitas: ' + fac.name + '?')) { networkFacilities.splice(fIdx, 1); }"
+                                                        class="px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200 transition-colors flex items-center gap-1 cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </div>
+
+                                            <!-- Form Edit Inline -->
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                                <div class="sm:col-span-2">
+                                                    <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Nama Pabrik / Fasilitas *</label>
+                                                    <input type="text" x-model="fac.name" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-bold">
+                                                </div>
+
+                                                <div>
+                                                    <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Badge / Tipe Pabrik</label>
+                                                    <input type="text" x-model="fac.badge" placeholder="Contoh: Plant 1 - Head Office" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                                </div>
+
+                                                <div>
+                                                    <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Tahun Berdiri (Est)</label>
+                                                    <input type="text" x-model="fac.est" placeholder="Contoh: Established Jan 1996" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                                </div>
+
+                                                <div class="sm:col-span-2">
+                                                    <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Alamat Lengkap</label>
+                                                    <textarea x-model="fac.address" rows="2" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black"></textarea>
+                                                </div>
+
+                                                <div>
+                                                    <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Nomor Telepon</label>
+                                                    <input type="text" x-model="fac.phone" placeholder="+62-21-..." class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono">
+                                                </div>
+
+                                                <div>
+                                                    <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Luas Area & Karyawan / Info</label>
+                                                    <input type="text" x-model="fac.stats" placeholder="Land Area: 55,000 m²..." class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                                </div>
+
+                                                <div class="sm:col-span-2">
+                                                    <label class="text-[10px] font-mono text-slate-600 uppercase font-bold block mb-0.5">Lingkup Produksi (Production Scope)</label>
+                                                    <input type="text" x-model="fac.scope" placeholder="2W & 4W Transmission Gear, Camshaft..." class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Action Toolbar Sub-Tab 7 -->
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                                <button type="button" @click="profileSubTab = 'directors'; window.scrollTo({top: 0, behavior: 'smooth'})" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer flex items-center gap-1.5">
+                                    <span>← Kembali ke 6. Board of Directors & Kartu</span>
+                                </button>
+                                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-musashi-red hover:bg-musashi-darkred shadow-sm cursor-pointer flex items-center gap-1.5">
+                                        <span>💾 Simpan Semua Jaringan Global & Profil</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Tambah Fasilitas Pabrik Baru -->
+                    <div x-show="showAddFacilityModal" style="display: none;" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                        <div @click.away="showAddFacilityModal = false" class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                                <h4 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                                    <span>➕ Tambah Pabrik / Fasilitas Global</span>
+                                </h4>
+                                <button type="button" @click="showAddFacilityModal = false" class="text-slate-400 hover:text-black text-xl font-bold">&times;</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Wilayah (Region) *</label>
+                                    <select x-model="newFacility.region" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-bold">
+                                        <option value="indonesia">🇮🇩 Indonesia (Pabrik Domestik)</option>
+                                        <option value="japan">🇯🇵 Japan (HQ & Fasilitas Jepang)</option>
+                                        <option value="europe">🇪🇺 Europe (Fasilitas Eropa)</option>
+                                        <option value="asia">🌏 Asia & Americas (Asia & Amerika)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Nama Pabrik / Fasilitas *</label>
+                                    <input type="text" x-model="newFacility.name" placeholder="Misal: PT Musashi Auto Parts Indonesia - Cikarang" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-bold">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge / Label Tipe</label>
+                                        <input type="text" x-model="newFacility.badge" placeholder="Misal: Plant 3 / Germany HQ" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Tahun Berdiri (Est)</label>
+                                        <input type="text" x-model="newFacility.est" placeholder="Misal: Established Jan 2024" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Alamat Lengkap *</label>
+                                    <textarea x-model="newFacility.address" rows="2" placeholder="Tuliskan alamat lengkap lokasi pabrik..." class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black"></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Nomor Telepon</label>
+                                        <input type="text" x-model="newFacility.phone" placeholder="+62-21-..." class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Luas Area & Karyawan</label>
+                                        <input type="text" x-model="newFacility.stats" placeholder="Land Area: ... • Workforce: ..." class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Lingkup Produksi (Production Scope)</label>
+                                    <input type="text" x-model="newFacility.scope" placeholder="Misal: 2W & 4W Transmission Gear, EV Powertrain..." class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-200 flex justify-end gap-2">
+                                <button type="button" @click="showAddFacilityModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">Batal</button>
+                                <button type="button" 
+                                        @click="
+                                            if(!newFacility.name || !newFacility.name.trim()) { alert('Silakan isi Nama Pabrik terlebih dahulu!'); return; }
+                                            networkFacilities.unshift({
+                                                id: 'fac_' + Date.now(),
+                                                region: newFacility.region,
+                                                badge: newFacility.badge || 'Plant',
+                                                name: newFacility.name,
+                                                est: newFacility.est || '',
+                                                address: newFacility.address || '',
+                                                phone: newFacility.phone || '',
+                                                scope: newFacility.scope || '',
+                                                stats: newFacility.stats || ''
+                                            });
+                                            newFacility = { region: 'indonesia', badge: '', name: '', est: '', address: '', phone: '', scope: '', stats: '' };
+                                            showAddFacilityModal = false;
+                                        "
+                                        class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-musashi-red hover:bg-musashi-darkred shadow-sm cursor-pointer">
+                                    + Tambahkan ke Daftar
                                 </button>
                             </div>
                         </div>

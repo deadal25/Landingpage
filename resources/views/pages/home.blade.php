@@ -1325,7 +1325,7 @@
                             </p>
                         </div>
                         <a href="{{ route('company.network') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-musashi-red hover:text-black gap-1.5 transition-colors self-start sm:self-center flex-shrink-0">
-                            <span>{{ __('messages.common.read_more') }}</span>
+                            <span>{{ \App\Models\LandingPageSetting::get('company_card7_btn_text', __('messages.common.read_more')) }}</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     </div>
