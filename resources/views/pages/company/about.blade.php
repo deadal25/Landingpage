@@ -139,7 +139,7 @@
                                 {{ \App\Models\LandingPageSetting::get('outline_plant2_info', 'Suryacipta City of Industry Kav 1-36 BC, Ciampel, Karawang (60,000 m²)') }}
                             </p>
                             <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
-                                <span>Karawang Plant</span>
+                                <span>{{ \App\Models\LandingPageSetting::get('outline_plant2_subtag', 'Karawang Plant') }}</span>
                                 <span class="text-musashi-red font-semibold">{{ \App\Models\LandingPageSetting::get('outline_plant2_tag', 'Mass Forging Center') }}</span>
                             </div>
                         </div>

@@ -1643,156 +1643,328 @@
                         </div>
 
                         @php
-                            $currentPlant1 = \App\Models\LandingPageSetting::get('outline_plant1_image', 'images/hero/hero-plant.jpg', false);
-                            $currentPlant1Src = (str_starts_with($currentPlant1, 'http') || str_starts_with($currentPlant1, 'data:') || str_starts_with($currentPlant1, '/')) ? $currentPlant1 : '/' . ltrim($currentPlant1, '/');
+                            $estStatVal = \App\Models\LandingPageSetting::get('outline_established_stat', '1996', false);
+                            $estLabelVal = \App\Models\LandingPageSetting::getForLocale('outline_established_stat_label', $editLocale, __('messages.company_stats.established'));
 
-                            $currentPlant2 = \App\Models\LandingPageSetting::get('outline_plant2_image', 'images/hero/hero-automotive.jpg', false);
-                            $currentPlant2Src = (str_starts_with($currentPlant2, 'http') || str_starts_with($currentPlant2, 'data:') || str_starts_with($currentPlant2, '/')) ? $currentPlant2 : '/' . ltrim($currentPlant2, '/');
+                            $empStatVal = \App\Models\LandingPageSetting::get('outline_employees_stat', '1,637+', false);
+                            $empLabelVal = \App\Models\LandingPageSetting::getForLocale('outline_employees_stat_label', $editLocale, __('messages.company_stats.workforce'));
+
+                            $areaStatVal = \App\Models\LandingPageSetting::get('outline_plant_area_stat', '115,000 m²', false);
+                            $areaLabelVal = \App\Models\LandingPageSetting::getForLocale('outline_plant_area_stat_label', $editLocale, __('messages.company_stats.plant_area'));
+
+                            $salesStatVal = \App\Models\LandingPageSetting::get('outline_sales_stat', 'IDR 2.8T+', false);
+                            $salesLabelVal = \App\Models\LandingPageSetting::getForLocale('outline_sales_stat_label', $editLocale, __('messages.company_stats.sales_scale'));
                         @endphp
-                        <!-- 1B. Bagian Jaringan Pabrik di Halaman About Us -->
-                        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-5">
+                        <!-- 1B. 4 Indikator Statistik Utama Landing Page (Fast Facts - Pindahan dari Company Outline) -->
+                        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-5"
+                             x-data="{
+                                 estStat: @js($estStatVal),
+                                 estLabel: @js($estLabelVal),
+                                 empStat: @js($empStatVal),
+                                 empLabel: @js($empLabelVal),
+                                 areaStat: @js($areaStatVal),
+                                 areaLabel: @js($areaLabelVal),
+                                 salesStat: @js($salesStatVal),
+                                 salesLabel: @js($salesLabelVal),
+                             }">
                             <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
                                 <div>
-                                    <span class="text-xs font-mono font-bold text-slate-800 block uppercase">🏭 Bagian Dua Pabrik Indonesia (Manufacturing Network)</span>
-                                    <p class="text-[11px] text-slate-500 mt-0.5">Kelola foto pabrik dan teks kartu fasilitas Cikarang & Karawang pada halaman Tentang Kami.</p>
+                                    <span class="text-xs font-mono font-bold text-emerald-700 block uppercase">📊 4 Indikator Statistik Utama Landing Page (Fast Facts)</span>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Empat kotak angka statistik pencapaian yang tampil di bawah banner header halaman Tentang Kami (/company/about-us).</p>
                                 </div>
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white text-slate-700 border border-slate-200 shadow-xs hidden sm:inline-block">
-                                    2 Pabrik Utama
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs hidden sm:inline-flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span>Tampil di /company/about-us</span>
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Seksi Pabrik</label>
-                                    <input type="text" name="about_plants_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_plants_badge', $editLocale, 'Manufacturing Network') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
-                                </div>
-                                <div>
-                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Headline Seksi Pabrik</label>
-                                    <input type="text" name="about_plants_headline_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_plants_headline', $editLocale, 'Two World-Class Indonesian Production Plants') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black font-semibold focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                            <!-- Live Preview Card (Mirip Tampilan Landing Page) -->
+                            <div class="space-y-1.5">
+                                <span class="text-[10px] font-mono uppercase font-bold text-slate-500 block">Preview Tampilan di Landing Page:</span>
+                                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                                    <div class="bg-slate-50 rounded-xl p-3 text-center border-t-2 border-t-musashi-red border border-slate-200">
+                                        <div class="text-xl sm:text-2xl font-black text-black font-mono" x-text="estStat || '1996'"></div>
+                                        <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-600 truncate mt-0.5" x-text="estLabel || 'Tahun Pendirian'"></div>
+                                    </div>
+                                    <div class="bg-slate-50 rounded-xl p-3 text-center border-t-2 border-t-slate-800 border border-slate-200">
+                                        <div class="text-xl sm:text-2xl font-black text-black font-mono" x-text="empStat || '1,637+'"></div>
+                                        <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-600 truncate mt-0.5" x-text="empLabel || 'Jumlah Karyawan'"></div>
+                                    </div>
+                                    <div class="bg-slate-50 rounded-xl p-3 text-center border-t-2 border-t-emerald-600 border border-slate-200">
+                                        <div class="text-xl sm:text-2xl font-black text-black font-mono" x-text="areaStat || '115,000 m²'"></div>
+                                        <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-600 truncate mt-0.5" x-text="areaLabel || 'Total Luas Area Pabrik'"></div>
+                                    </div>
+                                    <div class="bg-slate-50 rounded-xl p-3 text-center border-t-2 border-t-blue-600 border border-slate-200">
+                                        <div class="text-xl sm:text-2xl font-black text-black font-mono" x-text="salesStat || 'IDR 2.8T+'"></div>
+                                        <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-600 truncate mt-0.5" x-text="salesLabel || 'Skala Penjualan Tahunan'"></div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                                <!-- Pabrik 1: Cikarang -->
-                                <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3.5"
-                                     x-data="{
-                                         plant1Img: '{{ $currentPlant1Src }}',
-                                         defaultPlant1: '/images/hero/hero-plant.jpg',
-                                         handlePlant1File(e) {
-                                             const file = e.target.files[0];
-                                             if (!file) return;
-                                             const reader = new FileReader();
-                                             reader.onload = (ev) => { this.plant1Img = ev.target.result; };
-                                             reader.readAsDataURL(file);
-                                         },
-                                         resetPlant1() {
-                                             this.plant1Img = this.defaultPlant1;
-                                             if (this.$refs.plant1FileInput) this.$refs.plant1FileInput.value = '';
-                                         }
-                                     }">
-                                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                                        <span class="text-[11px] font-mono font-bold text-musashi-red uppercase block">Pabrik 1: Cikarang (Head Office)</span>
-                                        <span class="text-[10px] font-mono text-slate-400">Plant 1 Card</span>
-                                    </div>
+                            <!-- Input Form 4 Kolom Sesuai Gambar 1 -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                                    <label class="text-[10px] font-mono text-slate-700 uppercase block font-bold">1. Tahun Pendirian (Angka)</label>
+                                    <input type="text" x-model="estStat" name="outline_established_stat" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                    <label class="text-[9px] font-mono text-slate-500 uppercase block">Label Teks</label>
+                                    <input type="text" x-model="estLabel" name="outline_established_stat_label_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                </div>
+                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                                    <label class="text-[10px] font-mono text-slate-700 uppercase block font-bold">2. Jumlah Karyawan (Angka)</label>
+                                    <input type="text" x-model="empStat" name="outline_employees_stat" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                    <label class="text-[9px] font-mono text-slate-500 uppercase block">Label Teks</label>
+                                    <input type="text" x-model="empLabel" name="outline_employees_stat_label_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                </div>
+                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                                    <label class="text-[10px] font-mono text-slate-700 uppercase block font-bold">3. Total Luas Pabrik (Angka)</label>
+                                    <input type="text" x-model="areaStat" name="outline_plant_area_stat" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                    <label class="text-[9px] font-mono text-slate-500 uppercase block">Label Teks</label>
+                                    <input type="text" x-model="areaLabel" name="outline_plant_area_stat_label_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                </div>
+                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                                    <label class="text-[10px] font-mono text-slate-700 uppercase block font-bold">4. Skala Penjualan (Angka)</label>
+                                    <input type="text" x-model="salesStat" name="outline_sales_stat" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                    <label class="text-[9px] font-mono text-slate-500 uppercase block">Label Teks</label>
+                                    <input type="text" x-model="salesLabel" name="outline_sales_stat_label_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none shadow-2xs">
+                                </div>
+                            </div>
+                        </div>
 
-                                    <!-- Preview Foto Pabrik 1 -->
-                                    <div class="relative rounded-xl overflow-hidden border border-slate-200 h-40 bg-slate-100 group">
-                                        <img :src="plant1Img" alt="Pabrik 1 Cikarang" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300">
-                                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider text-black bg-white/95 border border-slate-200 shadow-2xs">
-                                            Cikarang Plant
-                                        </div>
-                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                            <button type="button" @click="$refs.plant1FileInput.click()" class="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-bold shadow-sm cursor-pointer hover:bg-slate-100">Ganti Foto</button>
-                                            <button type="button" @click="resetPlant1()" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold shadow-sm cursor-pointer hover:bg-black">Default</button>
-                                        </div>
-                                    </div>
+                        @php
+                            $plantBadgeVal = \App\Models\LandingPageSetting::getForLocale('about_plants_badge', $editLocale, 'Manufacturing Network');
+                            $plantHeadlineVal = \App\Models\LandingPageSetting::getForLocale('about_plants_headline', $editLocale, 'Two World-Class Indonesian Production Plants');
 
-                                    <input type="hidden" name="outline_plant1_image" :value="plant1Img">
-                                    <input type="file" x-ref="plant1FileInput" name="outline_plant1_image_file" accept="image/*" @change="handlePlant1File($event)" class="hidden">
+                            $currentPlant1 = \App\Models\LandingPageSetting::get('outline_plant1_image', 'images/hero/hero-plant.jpg', false);
+                            $currentPlant1Src = (str_starts_with($currentPlant1, 'http') || str_starts_with($currentPlant1, 'data:') || str_starts_with($currentPlant1, '/')) ? $currentPlant1 : '/' . ltrim($currentPlant1, '/');
+                            $plant1TitleVal = \App\Models\LandingPageSetting::getForLocale('outline_plant1_title', $editLocale, 'Plant 1 - Cikarang (Head Office)');
+                            $plant1NameVal = \App\Models\LandingPageSetting::getForLocale('outline_plant1_name', $editLocale, 'EJIP Industrial Park, Cikarang Selatan');
+                            $plant1InfoVal = \App\Models\LandingPageSetting::getForLocale('outline_plant1_info', $editLocale, 'EJIP Industrial Park Plot 3J-2, Cikarang Selatan, Bekasi (55,000 m²)');
+                            $plant1PhoneVal = \App\Models\LandingPageSetting::get('footer_phone_cikarang', '+62-21-8970866', false);
+                            $plant1TagVal = \App\Models\LandingPageSetting::getForLocale('outline_plant1_tag', $editLocale, 'Head Office & Plant');
 
+                            $currentPlant2 = \App\Models\LandingPageSetting::get('outline_plant2_image', 'images/hero/hero-automotive.jpg', false);
+                            $currentPlant2Src = (str_starts_with($currentPlant2, 'http') || str_starts_with($currentPlant2, 'data:') || str_starts_with($currentPlant2, '/')) ? $currentPlant2 : '/' . ltrim($currentPlant2, '/');
+                            $plant2TitleVal = \App\Models\LandingPageSetting::getForLocale('outline_plant2_title', $editLocale, 'Plant 2 - Karawang');
+                            $plant2NameVal = \App\Models\LandingPageSetting::getForLocale('outline_plant2_name', $editLocale, 'Suryacipta City of Industry, Karawang');
+                            $plant2InfoVal = \App\Models\LandingPageSetting::getForLocale('outline_plant2_info', $editLocale, 'Suryacipta City of Industry Kav 1-36 BC, Ciampel, Karawang (60,000 m²)');
+                            $plant2SubtagVal = \App\Models\LandingPageSetting::getForLocale('outline_plant2_subtag', $editLocale, 'Karawang Plant');
+                            $plant2TagVal = \App\Models\LandingPageSetting::getForLocale('outline_plant2_tag', $editLocale, 'Mass Forging Center');
+                        @endphp
+                        <!-- 1C. Bagian Dua Pabrik Indonesia (Manufacturing Network - Gambar 2) -->
+                        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-6"
+                             x-data="{
+                                 plantsBadge: @js($plantBadgeVal),
+                                 plantsHeadline: @js($plantHeadlineVal),
+
+                                 plant1Img: '{{ $currentPlant1Src }}',
+                                 defaultPlant1: '/images/hero/hero-plant.jpg',
+                                 plant1Title: @js($plant1TitleVal),
+                                 plant1Name: @js($plant1NameVal),
+                                 plant1Info: @js($plant1InfoVal),
+                                 plant1Phone: @js($plant1PhoneVal),
+                                 plant1Tag: @js($plant1TagVal),
+
+                                 plant2Img: '{{ $currentPlant2Src }}',
+                                 defaultPlant2: '/images/hero/hero-automotive.jpg',
+                                 plant2Title: @js($plant2TitleVal),
+                                 plant2Name: @js($plant2NameVal),
+                                 plant2Info: @js($plant2InfoVal),
+                                 plant2Subtag: @js($plant2SubtagVal),
+                                 plant2Tag: @js($plant2TagVal),
+
+                                 handlePlant1File(e) {
+                                     const file = e.target.files[0];
+                                     if (!file) return;
+                                     const reader = new FileReader();
+                                     reader.onload = (ev) => { this.plant1Img = ev.target.result; };
+                                     reader.readAsDataURL(file);
+                                 },
+                                 resetPlant1() {
+                                     this.plant1Img = this.defaultPlant1;
+                                     if (this.$refs.plant1FileInput) this.$refs.plant1FileInput.value = '';
+                                 },
+                                 handlePlant2File(e) {
+                                     const file = e.target.files[0];
+                                     if (!file) return;
+                                     const reader = new FileReader();
+                                     reader.onload = (ev) => { this.plant2Img = ev.target.result; };
+                                     reader.readAsDataURL(file);
+                                 },
+                                 resetPlant2() {
+                                     this.plant2Img = this.defaultPlant2;
+                                     if (this.$refs.plant2FileInput) this.$refs.plant2FileInput.value = '';
+                                 }
+                             }">
+                            <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                                <div>
+                                    <span class="text-xs font-mono font-bold text-slate-800 block uppercase">🏭 Bagian Dua Pabrik Indonesia (Manufacturing Network)</span>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Kelola foto pabrik, lokasi alamat, nomor telepon, dan kartu spesialisasi Cikarang & Karawang (persis Gambar 2).</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white text-slate-700 border border-slate-200 shadow-xs hidden sm:inline-flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-musashi-red"></span>
+                                    <span>Mirip Tampilan Landing Page</span>
+                                </span>
+                            </div>
+
+                            <!-- Header Seksi Pabrik -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Seksi Pabrik</label>
+                                    <input type="text" x-model="plantsBadge" name="about_plants_badge_{{ $editLocale }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Headline Seksi Pabrik</label>
+                                    <input type="text" x-model="plantsHeadline" name="about_plants_headline_{{ $editLocale }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black font-semibold focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                                </div>
+                            </div>
+
+                            <!-- Live Preview Sesuai Gambar 2 yang Dikirim User -->
+                            <div class="space-y-3 p-4 sm:p-5 bg-slate-100/80 rounded-2xl border border-slate-200">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span>Live Preview Card (Persis Seperti Gambar 2 di Landing Page)</span>
+                                    </span>
+                                    <span class="text-[10px] font-mono text-slate-400">/company/about-us</span>
+                                </div>
+
+                                <div class="space-y-1">
                                     <div class="flex items-center gap-2">
-                                        <button type="button" @click="$refs.plant1FileInput.click()" class="flex-1 py-1.5 px-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-mono text-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
-                                            <span>📷 Pilih Foto Cikarang</span>
-                                        </button>
-                                        <button type="button" @click="resetPlant1()" class="py-1.5 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-[10px] font-mono text-slate-600 cursor-pointer" title="Kembalikan foto bawaan">
-                                            ↺ Reset
-                                        </button>
+                                        <div class="w-3 h-0.5 bg-musashi-red"></div>
+                                        <span class="text-xs font-mono font-bold text-musashi-red uppercase tracking-wider" x-text="plantsBadge || 'MANUFACTURING NETWORK'"></span>
+                                    </div>
+                                    <h3 class="text-xl sm:text-2xl font-black text-black" x-text="plantsHeadline || 'Two World-Class Indonesian Production Plants'"></h3>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                    <!-- Card Preview Pabrik 1: Cikarang -->
+                                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all group">
+                                        <div class="h-48 sm:h-52 overflow-hidden relative bg-slate-100">
+                                            <img :src="plant1Img" alt="Cikarang Plant" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                            <span class="absolute top-4 left-4 px-3 py-1 rounded text-xs font-bold font-mono uppercase tracking-wider text-black bg-white/95 border border-slate-200 shadow-xs" x-text="plant1Title || 'PLANT 1 - CIKARANG (HEAD OFFICE)'"></span>
+                                        </div>
+                                        <div class="p-5 sm:p-6 space-y-3">
+                                            <h4 class="text-base sm:text-lg font-bold text-black" x-text="plant1Name || 'EJIP Industrial Park, Cikarang Selatan'"></h4>
+                                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed" x-text="plant1Info || 'EJIP Industrial Park Plot 3J-2, Cikarang Selatan, Bekasi (55,000 m²)'"></p>
+                                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                                                <span>Phone: <span x-text="plant1Phone || '+62-21-8970866'"></span></span>
+                                                <span class="text-musashi-red font-semibold" x-text="plant1Tag || 'Head Office & Plant'"></span>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="space-y-2 pt-1">
+                                    <!-- Card Preview Pabrik 2: Karawang -->
+                                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all group">
+                                        <div class="h-48 sm:h-52 overflow-hidden relative bg-slate-100">
+                                            <img :src="plant2Img" alt="Karawang Plant" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                            <span class="absolute top-4 left-4 px-3 py-1 rounded text-xs font-bold font-mono uppercase tracking-wider text-black bg-white/95 border border-slate-200 shadow-xs" x-text="plant2Title || 'PLANT 2 - KARAWANG'"></span>
+                                        </div>
+                                        <div class="p-5 sm:p-6 space-y-3">
+                                            <h4 class="text-base sm:text-lg font-bold text-black" x-text="plant2Name || 'Suryacipta City of Industry, Karawang'"></h4>
+                                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed" x-text="plant2Info || 'Suryacipta City of Industry Kav 1-36 BC, Ciampel, Karawang (60,000 m²)'"></p>
+                                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                                                <span x-text="plant2Subtag || 'Karawang Plant'"></span>
+                                                <span class="text-musashi-red font-semibold" x-text="plant2Tag || 'Mass Forging Center'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Kontrol Pengaturan Pabrik 1 & Pabrik 2 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+                                <!-- Form Pabrik 1: Cikarang -->
+                                <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                        <span class="text-xs font-mono font-bold text-musashi-red uppercase block">Pengaturan Pabrik 1: Cikarang (Head Office)</span>
+                                        <span class="text-[10px] font-mono text-slate-400">Plant 1 Controls</span>
+                                    </div>
+
+                                    <!-- Upload Foto Pabrik 1 -->
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] font-mono text-slate-700 uppercase block font-bold">Foto Pabrik 1</label>
+                                        <input type="hidden" name="outline_plant1_image" :value="plant1Img">
+                                        <input type="file" x-ref="plant1FileInput" name="outline_plant1_image_file" accept="image/*" @change="handlePlant1File($event)" class="hidden">
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" @click="$refs.plant1FileInput.click()" class="flex-1 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-mono text-slate-800 flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-2xs font-semibold">
+                                                <span>📷 Ganti / Upload Foto Cikarang</span>
+                                            </button>
+                                            <button type="button" @click="resetPlant1()" class="py-2 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-mono text-slate-600 cursor-pointer shadow-2xs" title="Kembalikan foto bawaan">
+                                                ↺ Default
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-3 pt-1">
                                         <div>
-                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Label Header Card</label>
-                                            <input type="text" name="outline_plant1_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_title', $editLocale, 'Plant 1 - Cikarang (Head Office)') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Label Header Card Pill</label>
+                                            <input type="text" x-model="plant1Title" name="outline_plant1_title_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none">
                                         </div>
                                         <div>
-                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Nama Lokasi Kawasan</label>
-                                            <input type="text" name="outline_plant1_name_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_name', $editLocale, 'EJIP Industrial Park, Cikarang Selatan') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Nama Lokasi Kawasan</label>
+                                            <input type="text" x-model="plant1Name" name="outline_plant1_name_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black font-semibold focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none">
                                         </div>
                                         <div>
-                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Tag Peran Pabrik</label>
-                                            <input type="text" name="outline_plant1_tag_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_tag', $editLocale, 'Head Office & Plant') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Alamat & Info Detail Kawasan</label>
+                                            <textarea x-model="plant1Info" name="outline_plant1_info_{{ $editLocale }}" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none leading-relaxed"></textarea>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Nomor Telepon</label>
+                                                <input type="text" x-model="plant1Phone" name="footer_phone_cikarang" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none font-mono">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Tag Peran Spesialisasi</label>
+                                                <input type="text" x-model="plant1Tag" name="outline_plant1_tag_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none font-semibold">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Pabrik 2: Karawang -->
-                                <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3.5"
-                                     x-data="{
-                                         plant2Img: '{{ $currentPlant2Src }}',
-                                         defaultPlant2: '/images/hero/hero-automotive.jpg',
-                                         handlePlant2File(e) {
-                                             const file = e.target.files[0];
-                                             if (!file) return;
-                                             const reader = new FileReader();
-                                             reader.onload = (ev) => { this.plant2Img = ev.target.result; };
-                                             reader.readAsDataURL(file);
-                                         },
-                                         resetPlant2() {
-                                             this.plant2Img = this.defaultPlant2;
-                                             if (this.$refs.plant2FileInput) this.$refs.plant2FileInput.value = '';
-                                         }
-                                     }">
+                                <!-- Form Pabrik 2: Karawang -->
+                                <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-4">
                                     <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                                        <span class="text-[11px] font-mono font-bold text-musashi-red uppercase block">Pabrik 2: Karawang Plant</span>
-                                        <span class="text-[10px] font-mono text-slate-400">Plant 2 Card</span>
+                                        <span class="text-xs font-mono font-bold text-musashi-red uppercase block">Pengaturan Pabrik 2: Karawang Plant</span>
+                                        <span class="text-[10px] font-mono text-slate-400">Plant 2 Controls</span>
                                     </div>
 
-                                    <!-- Preview Foto Pabrik 2 -->
-                                    <div class="relative rounded-xl overflow-hidden border border-slate-200 h-40 bg-slate-100 group">
-                                        <img :src="plant2Img" alt="Pabrik 2 Karawang" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300">
-                                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider text-black bg-white/95 border border-slate-200 shadow-2xs">
-                                            Karawang Plant
-                                        </div>
-                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                            <button type="button" @click="$refs.plant2FileInput.click()" class="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-bold shadow-sm cursor-pointer hover:bg-slate-100">Ganti Foto</button>
-                                            <button type="button" @click="resetPlant2()" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold shadow-sm cursor-pointer hover:bg-black">Default</button>
+                                    <!-- Upload Foto Pabrik 2 -->
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] font-mono text-slate-700 uppercase block font-bold">Foto Pabrik 2</label>
+                                        <input type="hidden" name="outline_plant2_image" :value="plant2Img">
+                                        <input type="file" x-ref="plant2FileInput" name="outline_plant2_image_file" accept="image/*" @change="handlePlant2File($event)" class="hidden">
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" @click="$refs.plant2FileInput.click()" class="flex-1 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-mono text-slate-800 flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-2xs font-semibold">
+                                                <span>📷 Ganti / Upload Foto Karawang</span>
+                                            </button>
+                                            <button type="button" @click="resetPlant2()" class="py-2 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-mono text-slate-600 cursor-pointer shadow-2xs" title="Kembalikan foto bawaan">
+                                                ↺ Default
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <input type="hidden" name="outline_plant2_image" :value="plant2Img">
-                                    <input type="file" x-ref="plant2FileInput" name="outline_plant2_image_file" accept="image/*" @change="handlePlant2File($event)" class="hidden">
-
-                                    <div class="flex items-center gap-2">
-                                        <button type="button" @click="$refs.plant2FileInput.click()" class="flex-1 py-1.5 px-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-mono text-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
-                                            <span>📷 Pilih Foto Karawang</span>
-                                        </button>
-                                        <button type="button" @click="resetPlant2()" class="py-1.5 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-[10px] font-mono text-slate-600 cursor-pointer" title="Kembalikan foto bawaan">
-                                            ↺ Reset
-                                        </button>
-                                    </div>
-
-                                    <div class="space-y-2 pt-1">
+                                    <div class="space-y-3 pt-1">
                                         <div>
-                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Label Header Card</label>
-                                            <input type="text" name="outline_plant2_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_title', $editLocale, 'Plant 2 - Karawang') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Label Header Card Pill</label>
+                                            <input type="text" x-model="plant2Title" name="outline_plant2_title_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none">
                                         </div>
                                         <div>
-                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Nama Lokasi Kawasan</label>
-                                            <input type="text" name="outline_plant2_name_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_name', $editLocale, 'Suryacipta City of Industry, Karawang') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Nama Lokasi Kawasan</label>
+                                            <input type="text" x-model="plant2Name" name="outline_plant2_name_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black font-semibold focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none">
                                         </div>
                                         <div>
-                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Tag Peran Pabrik</label>
-                                            <input type="text" name="outline_plant2_tag_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_tag', $editLocale, 'Mass Forging Center') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                            <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Alamat & Info Detail Kawasan</label>
+                                            <textarea x-model="plant2Info" name="outline_plant2_info_{{ $editLocale }}" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none leading-relaxed"></textarea>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Label Subtag Kiri</label>
+                                                <input type="text" x-model="plant2Subtag" name="outline_plant2_subtag_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-mono text-slate-600 uppercase block font-bold mb-1">Tag Peran Spesialisasi</label>
+                                                <input type="text" x-model="plant2Tag" name="outline_plant2_tag_{{ $editLocale }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-black focus:bg-white focus:ring-1 focus:ring-musashi-red outline-none font-semibold">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2327,35 +2499,20 @@
                             <span class="text-[10px] font-mono text-slate-400">Tampil di Landing Page & Halaman Company Outline</span>
                         </div>
 
-                        <!-- 3A. 4 Angka Statistik Utama di Landing Page -->
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-                            <span class="text-xs font-mono font-bold text-emerald-700 block uppercase">📊 4 Indikator Statistik Utama Landing Page (Fast Facts)</span>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div>
-                                    <label class="text-[10px] font-mono text-slate-700 uppercase block mb-1 font-bold">1. Tahun Pendirian (Angka)</label>
-                                    <input type="text" name="outline_established_stat" value="{{ \App\Models\LandingPageSetting::get('outline_established_stat', '1996', false) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold">
-                                    <label class="text-[9px] font-mono text-slate-500 uppercase block mt-1">Label Teks</label>
-                                    <input type="text" name="outline_established_stat_label_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_established_stat_label', $editLocale, __('messages.company_stats.established')) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs text-black mt-0.5">
+                        <!-- 3A. Info Pemindahan 4 Indikator Statistik Utama ke Sub-Tab 1. About Us -->
+                        <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-slate-50 to-white border border-emerald-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+                            <div class="space-y-1.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-600 text-white tracking-wider">Telah Dipindahkan</span>
+                                    <span class="text-xs font-mono font-bold text-emerald-800 uppercase">📊 4 Indikator Statistik Utama (Fast Facts) & Dua Pabrik</span>
                                 </div>
-                                <div>
-                                    <label class="text-[10px] font-mono text-slate-700 uppercase block mb-1 font-bold">2. Jumlah Karyawan (Angka)</label>
-                                    <input type="text" name="outline_employees_stat" value="{{ \App\Models\LandingPageSetting::get('outline_employees_stat', '1,637+', false) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold">
-                                    <label class="text-[9px] font-mono text-slate-500 uppercase block mt-1">Label Teks</label>
-                                    <input type="text" name="outline_employees_stat_label_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_employees_stat_label', $editLocale, __('messages.company_stats.workforce')) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs text-black mt-0.5">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-mono text-slate-700 uppercase block mb-1 font-bold">3. Total Luas Pabrik (Angka)</label>
-                                    <input type="text" name="outline_plant_area_stat" value="{{ \App\Models\LandingPageSetting::get('outline_plant_area_stat', '115,000 m²', false) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold">
-                                    <label class="text-[9px] font-mono text-slate-500 uppercase block mt-1">Label Teks</label>
-                                    <input type="text" name="outline_plant_area_stat_label_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant_area_stat_label', $editLocale, __('messages.company_stats.plant_area')) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs text-black mt-0.5">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-mono text-slate-700 uppercase block mb-1 font-bold">4. Skala Penjualan (Angka)</label>
-                                    <input type="text" name="outline_sales_stat" value="{{ \App\Models\LandingPageSetting::get('outline_sales_stat', 'IDR 2.8T+', false) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black font-mono font-bold">
-                                    <label class="text-[9px] font-mono text-slate-500 uppercase block mt-1">Label Teks</label>
-                                    <input type="text" name="outline_sales_stat_label_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_sales_stat_label', $editLocale, __('messages.company_stats.sales_scale')) }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs text-black mt-0.5">
-                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Pengaturan <strong>4 Angka Statistik Utama Landing Page</strong> (Tahun Pendirian, Jumlah Karyawan, Luas Pabrik, Skala Penjualan) serta <strong>Dua Pabrik Produksi Cikarang & Karawang (Gambar 2)</strong> kini dikelola di sub-tab <strong>1. About Us</strong> agar sesuai dengan tata letak visual di halaman profil Tentang Kami.
+                                </p>
                             </div>
+                            <button type="button" @click="profileSubTab = 'about'; window.scrollTo({top: 0, behavior: 'smooth'})" class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-[0.98]">
+                                <span>⚙️ Buka Pengaturan di 1. About Us →</span>
+                            </button>
                         </div>
 
                         <!-- 3B. Data Spesifikasi Lengkap Perusahaan -->
@@ -2396,13 +2553,19 @@
                                 <input type="text" name="outline_plant_area_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant_area', $editLocale, '115,000 m² (Cikarang & Karawang)') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
                             </div>
 
-                            <div class="col-span-full">
-                                <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Lokasi Pabrik 1 - Cikarang (Head Office)</label>
-                                <input type="text" name="outline_plant1_info_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_info', $editLocale, 'EJIP Industrial Park Plot 3J-2, Cikarang Selatan, Bekasi (55,000 m²)') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
-                            </div>
-                            <div class="col-span-full">
-                                <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Lokasi Pabrik 2 - Karawang Plant</label>
-                                <input type="text" name="outline_plant2_info_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_info', $editLocale, 'Suryacipta City of Industry Kav 1-36 BC, Ciampel, Karawang (60,000 m²)') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                            <div class="col-span-full p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="w-2 h-2 rounded-full bg-musashi-red"></span>
+                                        <span class="text-[11px] font-mono font-bold text-slate-800 uppercase">Lokasi & Foto Pabrik 1 (Cikarang) & Pabrik 2 (Karawang)</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 leading-relaxed">
+                                        Alamat detail, foto pabrik (Gambar 2), label badge, nomor telepon, dan peran spesialisasi kedua pabrik dikelola secara visual dengan live preview di sub-tab <strong>1. About Us</strong>.
+                                    </p>
+                                </div>
+                                <button type="button" @click="profileSubTab = 'about'; window.scrollTo({top: 0, behavior: 'smooth'})" class="flex-shrink-0 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-700 cursor-pointer shadow-2xs whitespace-nowrap">
+                                    Kelola di About Us →
+                                </button>
                             </div>
 
                             <div class="col-span-full">
