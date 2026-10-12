@@ -15,15 +15,23 @@
         <div class="flex items-center justify-between gap-2 sm:gap-4">
             
             <!-- Left: White Saturn Ring Logo + PT. Musashi Auto Parts Indonesia -->
-            <div class="flex items-center gap-2 sm:gap-3 flex-shrink min-w-0">
-                <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 group focus:outline-none min-w-0">
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 group focus:outline-none">
                     <!-- Saturn Orbit Logo in Pure White -->
                     <div class="w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 flex items-center justify-center flex-shrink-0">
                         <img src="{{ asset(\App\Models\LandingPageSetting::get('navbar_logo', 'images/business/musashi-white-logo.png', false)) }}" alt="PT. Musashi Auto Parts Indonesia" class="w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 object-contain transform group-hover:scale-105 transition-transform duration-200">
                     </div>
-                    <!-- Brand Typography exactly matching musashi.co.id with responsive truncate -->
-                    <span class="text-white font-bold text-xs xs:text-sm sm:text-base md:text-lg tracking-tight font-sans truncate max-w-[145px] xs:max-w-[210px] sm:max-w-none whitespace-nowrap">
-                        {{ \App\Models\LandingPageSetting::getForLocale('navbar_brand_title', app()->getLocale(), 'PT. Musashi Auto Parts Indonesia') }}
+                    <!-- Brand Typography: 2-line break on mobile matching reference design, single line on desktop -->
+                    @php
+                        $brandTitle = \App\Models\LandingPageSetting::getForLocale('navbar_brand_title', app()->getLocale(), 'PT. Musashi Auto Parts Indonesia');
+                        $brandHtml = preg_replace(
+                            '/^(PT\.?\s+Musashi\s+Auto)\s+(Parts\s+Indonesia)$/iu',
+                            '<span class="block sm:inline">$1</span><span class="hidden sm:inline"> </span><span class="block sm:inline">$2</span>',
+                            e($brandTitle)
+                        );
+                    @endphp
+                    <span class="text-white font-bold text-xs xs:text-sm sm:text-base md:text-lg tracking-tight font-sans leading-tight">
+                        {!! $brandHtml !!}
                     </span>
                 </a>
             </div>
