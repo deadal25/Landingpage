@@ -1,5 +1,5 @@
 <footer class="bg-black text-white font-sans pt-12 sm:pt-14 pb-12 relative overflow-hidden" x-data="{}">
-    <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Main Top Content Grid -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-white/10">
@@ -75,7 +75,7 @@
         <div class="pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             
             <!-- Left: Follow us -->
-            <div class="text-xs sm:text-sm text-white/90">
+            <div class="text-xs sm:text-sm text-white/90 pl-12 sm:pl-14 xl:pl-0">
                 <div class="flex items-center gap-3">
                     <span class="font-normal text-white">Follow us :</span>
                     <!-- YouTube -->

@@ -8,7 +8,7 @@
     <!-- Top Announcement Bar (Configurable in /SuperadminMusashi) -->
     @if(\App\Models\LandingPageSetting::get('announcement_bar_enabled', '0', false) === '1')
         <div class="bg-red-50 border-b border-red-200 text-slate-800 text-xs sm:text-sm py-2.5 px-4 text-center font-medium relative z-30">
-            <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto flex items-center justify-center gap-2">
+            <div class="max-w-7xl mx-auto flex items-center justify-center gap-2">
                 <span class="inline-block w-2 h-2 rounded-full bg-musashi-red animate-pulse"></span>
                 @php $annLink = \App\Models\LandingPageSetting::get('announcement_bar_link', '', false); @endphp
                 @if(!empty($annLink))
@@ -116,7 +116,7 @@
                 this.modalImgIndex = (this.modalImgIndex - 1 + this.activeNews.images.length) % this.activeNews.images.length;
             }
         }">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <!-- Section Header with Title, Carousel Controls & All News Link -->
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
@@ -528,7 +528,7 @@
 
     <!-- 2. FEATURED AUTOMOTIVE & EV PRODUCTS -->
     <section id="products" class="py-20 sm:py-24 bg-white border-b border-slate-200 scroll-mt-24">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-4 border-b border-slate-100">
                 <div>
                     <span class="text-musashi-red text-xs font-bold uppercase tracking-widest font-mono">
@@ -583,7 +583,7 @@
 
     <!-- 3. OUR BUSINESS & 4 GLOBAL PILLARS SECTION (Kompetensi Inti) -->
     <section id="business" class="py-20 sm:py-24 bg-slate-50/70 border-b border-slate-200 scroll-mt-24">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <!-- Section Header: Exactly matching Image 2 reference style -->
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-6 pb-4 border-b border-slate-200">
@@ -774,7 +774,7 @@
 
     <!-- 4. TECHNOLOGY & MONOZUKURI (Matching Technology Page Pillars) -->
     <section id="technology" class="py-16 sm:py-20 bg-[#F8F9FA] border-b border-slate-200 scroll-mt-24">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 
                 <!-- Left: Technology Story (7 Cols) -->
@@ -954,7 +954,7 @@
 
     <!-- 5. INNOVATION & OPEN CO-CREATION SECTION (Polished & Harmonious) -->
     <section id="innovation" class="py-16 sm:py-20 bg-white border-b border-slate-200 scroll-mt-24">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 
                 <!-- Left: Innovation Story & Pillars (7 Cols) -->
@@ -1134,7 +1134,7 @@
 
     <!-- 6. COMPANY OVERVIEW SECTION (All 7 Pillars with In-Page Anchors & Read More) -->
     <section id="company" class="py-20 sm:py-24 bg-white border-b border-slate-200 scroll-mt-24">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-musashi-red text-xs font-mono font-bold tracking-widest uppercase mb-3">
@@ -1338,7 +1338,7 @@
 
     <!-- 5B. DEDICATED BOARD OF DIRECTORS SHOWCASE (Executive Leadership) -->
     <section id="directors" class="py-20 sm:py-24 bg-slate-50 border-b border-slate-200 scroll-mt-24">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-musashi-red text-xs font-mono font-bold tracking-widest uppercase mb-3">
                     <span>{{ \App\Models\LandingPageSetting::get('bod_badge', __('messages.nav.bod')) }}</span>
@@ -1399,7 +1399,7 @@
 
     <!-- 6. SUSTAINABILITY & ESG (Green Company Commitment) -->
     <section id="sustainability" class="py-20 sm:py-24 bg-[#F8F9FA] border-b border-slate-200 scroll-mt-24">
-        <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-4xl mx-auto text-center space-y-6">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-mono font-bold tracking-widest uppercase">
                     <span>{{ \App\Models\LandingPageSetting::get('sustainability_badge', __('messages.nav.sustainability')) }}</span>

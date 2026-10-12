@@ -99,7 +99,7 @@
     @endforeach
 
     <!-- Slide Content Overlay Container -->
-    <div class="relative z-20 max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-28 w-full">
+    <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-28 w-full">
         @foreach($activeSlides as $index => $slide)
             @php
                 $headline = $slide['headline_' . $locale] ?? $slide['headline_id'] ?? $slide['headline'] ?? '';

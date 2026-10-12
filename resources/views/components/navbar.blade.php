@@ -11,7 +11,7 @@
     :class="scrolled ? 'bg-black/95 shadow-xl py-3 backdrop-blur-md border-b border-white/10' : 'bg-black/85 py-3.5 sm:py-4 shadow-lg backdrop-blur-sm border-b border-white/10'"
     class="fixed top-0 inset-x-0 z-50 transition-all duration-300">
 
-    <div class="max-w-7xl 2xl:max-w-[1536px] 3xl:max-w-[1780px] mx-auto px-3.5 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-2 sm:gap-4">
             
             <!-- Left: White Saturn Ring Logo + PT. Musashi Auto Parts Indonesia -->
