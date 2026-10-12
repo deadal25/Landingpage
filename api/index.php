@@ -31,6 +31,16 @@ if (is_dir($origBootstrap)) {
     }
 }
 
+// Remove any stale bootstrap cache files that reference dev-only packages (e.g. Laravel\Pail, Laravel\Sail)
+foreach ([$tmpBootstrap . '/cache/packages.php', $tmpBootstrap . '/cache/services.php'] as $cacheFile) {
+    if (file_exists($cacheFile)) {
+        $content = @file_get_contents($cacheFile);
+        if ($content && (str_contains($content, 'PailServiceProvider') || str_contains($content, 'SailServiceProvider'))) {
+            @unlink($cacheFile);
+        }
+    }
+}
+
 // Copy SQLite database to /tmp if it exists in repository
 $databaseFile = __DIR__ . '/../database/database.sqlite';
 $tmpDatabase = '/tmp/database.sqlite';
