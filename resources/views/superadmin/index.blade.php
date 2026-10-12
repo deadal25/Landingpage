@@ -1352,7 +1352,7 @@
             <!-- TAB 3: PROFIL PERUSAHAAN (ABOUT US)       -->
             <!-- ========================================== -->
             <div x-show="currentTab === 'profile'" class="space-y-6">
-                <form action="{{ route('superadmin.update') }}" method="POST" class="space-y-6">
+                <form action="{{ route('superadmin.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     <input type="hidden" name="redirect_tab" value="profile">
                     <input type="hidden" name="redirect_subtab" :value="profileSubTab">
@@ -1461,91 +1461,339 @@
                             <span class="text-[10px] font-mono text-slate-400">Tampil di Halaman /company/about-us</span>
                         </div>
 
-                        <!-- 1A. Header Banner & Identitas Utama -->
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
-                            <span class="text-xs font-mono font-bold text-musashi-red block uppercase">🏷️ Header Banner & Identitas Perusahaan</span>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @php
+                            $currentAboutHero = \App\Models\LandingPageSetting::get('about_hero_image', 'images/hero/hero-sunrise.jpg', false);
+                            $currentAboutHeroSrc = (str_starts_with($currentAboutHero, 'http') || str_starts_with($currentAboutHero, 'data:') || str_starts_with($currentAboutHero, '/')) ? $currentAboutHero : '/' . ltrim($currentAboutHero, '/');
+
+                            $initHeritageTitle = \App\Models\LandingPageSetting::getForLocale('about_heritage_title', $editLocale, 'Heritage & Joint Venture');
+                            $initHeritageText = \App\Models\LandingPageSetting::getForLocale('about_heritage', $editLocale, 'Joint venture between Musashi Seimitsu Industry Co., Ltd., Japan (80%) and PT Astra Honda Motor (20%).');
+                        @endphp
+                        <!-- 1A. Header Banner, Identitas Utama & Live Hero Preview -->
+                        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-6"
+                             x-data="{
+                                 aboutHeroImg: '{{ $currentAboutHeroSrc }}',
+                                 defaultHeroImg: '/images/hero/hero-sunrise.jpg',
+                                 heritageTitle: @js($initHeritageTitle),
+                                 heritageText: @js($initHeritageText),
+                                 handleHeroFile(e) {
+                                     const file = e.target.files[0];
+                                     if (!file) return;
+                                     if (file.size > 10 * 1024 * 1024) {
+                                         alert('Ukuran file terlalu besar (maksimal 10MB)');
+                                         return;
+                                     }
+                                     const reader = new FileReader();
+                                     reader.onload = (ev) => {
+                                         this.aboutHeroImg = ev.target.result;
+                                     };
+                                     reader.readAsDataURL(file);
+                                 },
+                                 selectPreset(path) {
+                                     this.aboutHeroImg = path;
+                                     if (this.$refs.aboutHeroFileInput) {
+                                         this.$refs.aboutHeroFileInput.value = '';
+                                     }
+                                 },
+                                 resetDefault() {
+                                     this.aboutHeroImg = this.defaultHeroImg;
+                                     if (this.$refs.aboutHeroFileInput) {
+                                         this.$refs.aboutHeroFileInput.value = '';
+                                     }
+                                 }
+                             }">
+                            
+                            <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
                                 <div>
-                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Header Banner</label>
-                                    <input type="text" name="about_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_badge', $editLocale, 'Company Profile') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    <span class="text-xs font-mono font-bold text-musashi-red uppercase block">🏷️ Header Banner, Identitas Perusahaan & Foto Utama</span>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Atur teks narasi identitas perusahaan sekaligus foto banner utama yang tampil di landing page /company/about-us.</p>
                                 </div>
-                                <div>
-                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Identitas Korporat</label>
-                                    <input type="text" name="about_identity_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_identity_badge', $editLocale, 'Corporate Identity') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
-                                </div>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white text-slate-700 border border-slate-200 shadow-xs hidden sm:inline-flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span>Tampilan Mirip Landing Page</span>
+                                </span>
                             </div>
 
-                            <div>
-                                <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Headline Profil</label>
-                                <input type="text" name="about_headline_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_headline', $editLocale, 'Break Barriers and Go on Adventures!') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-bold">
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Sub-Headline / Filosofi Pembuka</label>
-                                <textarea name="about_sub_{{ $editLocale }}" rows="2" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">{{ \App\Models\LandingPageSetting::getForLocale('about_sub', $editLocale, 'According to Musashi\'s Philosophy, for "a world where the earth and people coexist in prosperity and harmony," each one of us became adventurers and we will create a path forward into the future.') }}</textarea>
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Deskripsi Narasi Utama Profil</label>
-                                <textarea name="about_desc_{{ $editLocale }}" rows="4" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black leading-relaxed">{{ \App\Models\LandingPageSetting::getForLocale('about_desc', $editLocale, 'Looking to the year 2038, the 100th anniversary of Musashi Seimitsu Industry\'s founding, we break free of limitations to create new value that is not an extension of the present. Through seamless collaboration between our Cikarang and Karawang facilities and global headquarters in Toyohashi, Japan, we remain an indispensable partner for the world\'s premier automotive OEMs.') }}</textarea>
-                            </div>
+                            <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+                                <!-- Kolom Kiri: Form Input Teks -->
+                                <div class="xl:col-span-7 space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Header Banner</label>
+                                            <input type="text" name="about_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_badge', $editLocale, 'Company Profile') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                                        </div>
+                                        <div>
+                                            <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Identitas Korporat</label>
+                                            <input type="text" name="about_identity_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_identity_badge', $editLocale, 'Corporate Identity') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                                        </div>
+                                    </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Kemitraan (Heritage Title)</label>
-                                    <input type="text" name="about_heritage_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_heritage_title', $editLocale, 'Heritage & Joint Venture') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Headline Profil</label>
+                                        <input type="text" name="about_headline_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_headline', $editLocale, 'Break Barriers and Go on Adventures!') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Sub-Headline / Filosofi Pembuka</label>
+                                        <textarea name="about_sub_{{ $editLocale }}" rows="2" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs leading-relaxed">{{ \App\Models\LandingPageSetting::getForLocale('about_sub', $editLocale, 'According to Musashi\'s Philosophy, for "a world where the earth and people coexist in prosperity and harmony," each one of us became adventurers and we will create a path forward into the future.') }}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Deskripsi Narasi Utama Profil</label>
+                                        <textarea name="about_desc_{{ $editLocale }}" rows="4" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black leading-relaxed focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">{{ \App\Models\LandingPageSetting::getForLocale('about_desc', $editLocale, 'Looking to the year 2038, the 100th anniversary of Musashi Seimitsu Industry\'s founding, we break free of limitations to create new value that is not an extension of the present. Through seamless collaboration between our Cikarang and Karawang facilities and global headquarters in Toyohashi, Japan, we remain an indispensable partner for the world\'s premier automotive OEMs.') }}</textarea>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                                        <div>
+                                            <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Judul Kemitraan (Heritage Title)</label>
+                                            <input type="text" x-model="heritageTitle" name="about_heritage_title_{{ $editLocale }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs font-semibold">
+                                        </div>
+                                        <div>
+                                            <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Informasi Kemitraan (Heritage)</label>
+                                            <input type="text" x-model="heritageText" name="about_heritage_{{ $editLocale }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Informasi Kemitraan (Heritage / Joint Venture)</label>
-                                    <input type="text" name="about_heritage_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_heritage', $editLocale, 'Joint venture between Musashi Seimitsu Industry Co., Ltd., Japan (80%) and PT Astra Honda Motor (20%).') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+
+                                <!-- Kolom Kanan: Live Preview Card Mirip Landing Page & Uploader -->
+                                <div class="xl:col-span-5 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <label class="text-[11px] font-mono text-slate-800 uppercase block font-bold">
+                                                🖼️ Foto Banner About Us (Live Preview)
+                                            </label>
+                                            <p class="text-[10px] text-slate-500">Tampilan persis seperti di landing page /company/about-us</p>
+                                        </div>
+                                        <span class="text-[10px] font-mono font-bold text-musashi-red bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                                            Real-Time Preview
+                                        </span>
+                                    </div>
+
+                                    <!-- Kartu Preview Mirip Landing Page -->
+                                    <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-white p-2.5 group">
+                                        <!-- Gambar Banner -->
+                                        <div class="w-full h-64 sm:h-72 rounded-xl overflow-hidden bg-slate-100 relative">
+                                            <img :src="aboutHeroImg" alt="Musashi About Us Hero Preview" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500">
+                                            
+                                            <!-- Floating Heritage Card (Mirip Landing Page) -->
+                                            <div class="absolute bottom-3 left-3 right-3 p-3.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/90 text-xs text-slate-700 shadow-lg">
+                                                <div class="flex items-center gap-1.5 mb-1">
+                                                    <span class="w-2 h-2 rounded-full bg-musashi-red flex-shrink-0"></span>
+                                                    <strong class="text-black font-bold text-xs truncate block" x-text="heritageTitle || 'Heritage & Joint Venture'"></strong>
+                                                </div>
+                                                <p class="text-[11px] text-slate-600 leading-snug line-clamp-2" x-text="heritageText || 'Joint venture between Musashi Seimitsu Industry Co., Ltd., Japan (80%) and PT Astra Honda Motor (20%).'"></p>
+                                            </div>
+
+                                            <!-- Tag Indikator Status -->
+                                            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-black/75 text-white backdrop-blur-xs flex items-center gap-1.5 shadow-sm">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                <span>Landing Page Preview</span>
+                                            </div>
+
+                                            <!-- Quick Overlay Action -->
+                                            <div class="absolute top-3 right-3 flex items-center gap-1">
+                                                <button type="button" @click="$refs.aboutHeroFileInput.click()" class="p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white backdrop-blur-xs transition-colors cursor-pointer" title="Ganti Gambar">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hidden Input & File Input -->
+                                    <input type="hidden" name="about_hero_image" :value="aboutHeroImg">
+                                    <input type="file" x-ref="aboutHeroFileInput" name="about_hero_image_file" accept="image/*" @change="handleHeroFile($event)" class="hidden">
+
+                                    <!-- Tombol Upload & Reset -->
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" @click="$refs.aboutHeroFileInput.click()" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-musashi-red hover:bg-musashi-darkred shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            <span>📷 Ganti / Upload Foto Baru</span>
+                                        </button>
+                                        <button type="button" @click="resetDefault()" class="py-2.5 px-3.5 rounded-xl text-xs font-semibold text-slate-700 hover:text-black bg-white hover:bg-slate-100 border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Kembalikan ke foto bawaan">
+                                            <span>↺ Default</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Presets Cepat -->
+                                    <div class="p-3 bg-white rounded-xl border border-slate-200/90 shadow-2xs space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-[10px] font-mono uppercase font-bold text-slate-500">Pilihan Foto Cepat (Presets):</span>
+                                            <span class="text-[9px] font-mono text-slate-400">Klik untuk langsung terapkan</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <button type="button" @click="selectPreset('/images/hero/hero-sunrise.jpg')" :class="aboutHeroImg.includes('hero-sunrise') ? 'ring-2 ring-musashi-red border-transparent shadow-xs' : 'border-slate-200 hover:border-slate-400'" class="p-1 rounded-xl border bg-slate-50 text-left transition-all cursor-pointer group">
+                                                <img src="{{ asset('images/hero/hero-sunrise.jpg') }}" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-102 transition-transform" alt="Sunrise">
+                                                <span class="text-[9px] font-mono text-slate-700 block truncate text-center font-bold">1. Sunrise</span>
+                                            </button>
+                                            <button type="button" @click="selectPreset('/images/hero/hero-plant.jpg')" :class="aboutHeroImg.includes('hero-plant') ? 'ring-2 ring-musashi-red border-transparent shadow-xs' : 'border-slate-200 hover:border-slate-400'" class="p-1 rounded-xl border bg-slate-50 text-left transition-all cursor-pointer group">
+                                                <img src="{{ asset('images/hero/hero-plant.jpg') }}" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-102 transition-transform" alt="Pabrik Plant">
+                                                <span class="text-[9px] font-mono text-slate-700 block truncate text-center font-bold">2. Pabrik Plant</span>
+                                            </button>
+                                            <button type="button" @click="selectPreset('/images/hero/hero-automotive.jpg')" :class="aboutHeroImg.includes('hero-automotive') ? 'ring-2 ring-musashi-red border-transparent shadow-xs' : 'border-slate-200 hover:border-slate-400'" class="p-1 rounded-xl border bg-slate-50 text-left transition-all cursor-pointer group">
+                                                <img src="{{ asset('images/hero/hero-automotive.jpg') }}" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-102 transition-transform" alt="Automotive">
+                                                <span class="text-[9px] font-mono text-slate-700 block truncate text-center font-bold">3. Automotive</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tip Bantuan -->
+                                    <div class="p-3 rounded-xl bg-slate-100/80 border border-slate-200 flex items-start gap-2.5 text-[11px] text-slate-600 leading-relaxed">
+                                        <span class="text-musashi-red font-bold text-sm leading-none mt-0.5">💡</span>
+                                        <span>Gambar yang dipilih di atas akan langsung menggantikan gambar hero di halaman <a href="{{ route('company.about') }}" target="_blank" class="font-bold underline text-musashi-red hover:text-musashi-darkred">/company/about-us</a> setelah Anda menekan tombol <strong>Simpan Semua Profil</strong>.</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+                        @php
+                            $currentPlant1 = \App\Models\LandingPageSetting::get('outline_plant1_image', 'images/hero/hero-plant.jpg', false);
+                            $currentPlant1Src = (str_starts_with($currentPlant1, 'http') || str_starts_with($currentPlant1, 'data:') || str_starts_with($currentPlant1, '/')) ? $currentPlant1 : '/' . ltrim($currentPlant1, '/');
+
+                            $currentPlant2 = \App\Models\LandingPageSetting::get('outline_plant2_image', 'images/hero/hero-automotive.jpg', false);
+                            $currentPlant2Src = (str_starts_with($currentPlant2, 'http') || str_starts_with($currentPlant2, 'data:') || str_starts_with($currentPlant2, '/')) ? $currentPlant2 : '/' . ltrim($currentPlant2, '/');
+                        @endphp
                         <!-- 1B. Bagian Jaringan Pabrik di Halaman About Us -->
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
-                            <span class="text-xs font-mono font-bold text-slate-800 block uppercase">🏭 Bagian Dua Pabrik Indonesia (Manufacturing Network)</span>
+                        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-5">
+                            <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                                <div>
+                                    <span class="text-xs font-mono font-bold text-slate-800 block uppercase">🏭 Bagian Dua Pabrik Indonesia (Manufacturing Network)</span>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Kelola foto pabrik dan teks kartu fasilitas Cikarang & Karawang pada halaman Tentang Kami.</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white text-slate-700 border border-slate-200 shadow-xs hidden sm:inline-block">
+                                    2 Pabrik Utama
+                                </span>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Badge Seksi Pabrik</label>
-                                    <input type="text" name="about_plants_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_plants_badge', $editLocale, 'Manufacturing Network') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black">
+                                    <input type="text" name="about_plants_badge_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_plants_badge', $editLocale, 'Manufacturing Network') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
                                 </div>
                                 <div>
                                     <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">Headline Seksi Pabrik</label>
-                                    <input type="text" name="about_plants_headline_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_plants_headline', $editLocale, 'Two World-Class Indonesian Production Plants') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-black font-semibold">
+                                    <input type="text" name="about_plants_headline_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('about_plants_headline', $editLocale, 'Two World-Class Indonesian Production Plants') }}" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-black font-semibold focus:ring-1 focus:ring-musashi-red focus:border-musashi-red outline-none shadow-xs">
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <!-- Pabrik 1 -->
-                                <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
-                                    <span class="text-[10px] font-mono font-bold text-musashi-red uppercase block">Pabrik 1: Cikarang (Head Office)</span>
-                                    <div>
-                                        <label class="text-[9px] font-mono text-slate-500 uppercase block">Label Header Card</label>
-                                        <input type="text" name="outline_plant1_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_title', $editLocale, 'Plant 1 - Cikarang (Head Office)') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                <!-- Pabrik 1: Cikarang -->
+                                <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3.5"
+                                     x-data="{
+                                         plant1Img: '{{ $currentPlant1Src }}',
+                                         defaultPlant1: '/images/hero/hero-plant.jpg',
+                                         handlePlant1File(e) {
+                                             const file = e.target.files[0];
+                                             if (!file) return;
+                                             const reader = new FileReader();
+                                             reader.onload = (ev) => { this.plant1Img = ev.target.result; };
+                                             reader.readAsDataURL(file);
+                                         },
+                                         resetPlant1() {
+                                             this.plant1Img = this.defaultPlant1;
+                                             if (this.$refs.plant1FileInput) this.$refs.plant1FileInput.value = '';
+                                         }
+                                     }">
+                                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                        <span class="text-[11px] font-mono font-bold text-musashi-red uppercase block">Pabrik 1: Cikarang (Head Office)</span>
+                                        <span class="text-[10px] font-mono text-slate-400">Plant 1 Card</span>
                                     </div>
-                                    <div>
-                                        <label class="text-[9px] font-mono text-slate-500 uppercase block">Nama Lokasi Kawasan</label>
-                                        <input type="text" name="outline_plant1_name_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_name', $editLocale, 'EJIP Industrial Park, Cikarang Selatan') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+
+                                    <!-- Preview Foto Pabrik 1 -->
+                                    <div class="relative rounded-xl overflow-hidden border border-slate-200 h-40 bg-slate-100 group">
+                                        <img :src="plant1Img" alt="Pabrik 1 Cikarang" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300">
+                                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider text-black bg-white/95 border border-slate-200 shadow-2xs">
+                                            Cikarang Plant
+                                        </div>
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button type="button" @click="$refs.plant1FileInput.click()" class="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-bold shadow-sm cursor-pointer hover:bg-slate-100">Ganti Foto</button>
+                                            <button type="button" @click="resetPlant1()" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold shadow-sm cursor-pointer hover:bg-black">Default</button>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label class="text-[9px] font-mono text-slate-500 uppercase block">Tag Peran Pabrik</label>
-                                        <input type="text" name="outline_plant1_tag_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_tag', $editLocale, 'Head Office & Plant') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+
+                                    <input type="hidden" name="outline_plant1_image" :value="plant1Img">
+                                    <input type="file" x-ref="plant1FileInput" name="outline_plant1_image_file" accept="image/*" @change="handlePlant1File($event)" class="hidden">
+
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" @click="$refs.plant1FileInput.click()" class="flex-1 py-1.5 px-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-mono text-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                                            <span>📷 Pilih Foto Cikarang</span>
+                                        </button>
+                                        <button type="button" @click="resetPlant1()" class="py-1.5 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-[10px] font-mono text-slate-600 cursor-pointer" title="Kembalikan foto bawaan">
+                                            ↺ Reset
+                                        </button>
+                                    </div>
+
+                                    <div class="space-y-2 pt-1">
+                                        <div>
+                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Label Header Card</label>
+                                            <input type="text" name="outline_plant1_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_title', $editLocale, 'Plant 1 - Cikarang (Head Office)') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Nama Lokasi Kawasan</label>
+                                            <input type="text" name="outline_plant1_name_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_name', $editLocale, 'EJIP Industrial Park, Cikarang Selatan') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Tag Peran Pabrik</label>
+                                            <input type="text" name="outline_plant1_tag_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant1_tag', $editLocale, 'Head Office & Plant') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Pabrik 2 -->
-                                <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
-                                    <span class="text-[10px] font-mono font-bold text-musashi-red uppercase block">Pabrik 2: Karawang Plant</span>
-                                    <div>
-                                        <label class="text-[9px] font-mono text-slate-500 uppercase block">Label Header Card</label>
-                                        <input type="text" name="outline_plant2_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_title', $editLocale, 'Plant 2 - Karawang') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                <!-- Pabrik 2: Karawang -->
+                                <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3.5"
+                                     x-data="{
+                                         plant2Img: '{{ $currentPlant2Src }}',
+                                         defaultPlant2: '/images/hero/hero-automotive.jpg',
+                                         handlePlant2File(e) {
+                                             const file = e.target.files[0];
+                                             if (!file) return;
+                                             const reader = new FileReader();
+                                             reader.onload = (ev) => { this.plant2Img = ev.target.result; };
+                                             reader.readAsDataURL(file);
+                                         },
+                                         resetPlant2() {
+                                             this.plant2Img = this.defaultPlant2;
+                                             if (this.$refs.plant2FileInput) this.$refs.plant2FileInput.value = '';
+                                         }
+                                     }">
+                                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                        <span class="text-[11px] font-mono font-bold text-musashi-red uppercase block">Pabrik 2: Karawang Plant</span>
+                                        <span class="text-[10px] font-mono text-slate-400">Plant 2 Card</span>
                                     </div>
-                                    <div>
-                                        <label class="text-[9px] font-mono text-slate-500 uppercase block">Nama Lokasi Kawasan</label>
-                                        <input type="text" name="outline_plant2_name_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_name', $editLocale, 'Suryacipta City of Industry, Karawang') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+
+                                    <!-- Preview Foto Pabrik 2 -->
+                                    <div class="relative rounded-xl overflow-hidden border border-slate-200 h-40 bg-slate-100 group">
+                                        <img :src="plant2Img" alt="Pabrik 2 Karawang" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300">
+                                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider text-black bg-white/95 border border-slate-200 shadow-2xs">
+                                            Karawang Plant
+                                        </div>
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button type="button" @click="$refs.plant2FileInput.click()" class="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-bold shadow-sm cursor-pointer hover:bg-slate-100">Ganti Foto</button>
+                                            <button type="button" @click="resetPlant2()" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold shadow-sm cursor-pointer hover:bg-black">Default</button>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label class="text-[9px] font-mono text-slate-500 uppercase block">Tag Peran Pabrik</label>
-                                        <input type="text" name="outline_plant2_tag_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_tag', $editLocale, 'Mass Forging Center') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+
+                                    <input type="hidden" name="outline_plant2_image" :value="plant2Img">
+                                    <input type="file" x-ref="plant2FileInput" name="outline_plant2_image_file" accept="image/*" @change="handlePlant2File($event)" class="hidden">
+
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" @click="$refs.plant2FileInput.click()" class="flex-1 py-1.5 px-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-mono text-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                                            <span>📷 Pilih Foto Karawang</span>
+                                        </button>
+                                        <button type="button" @click="resetPlant2()" class="py-1.5 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-[10px] font-mono text-slate-600 cursor-pointer" title="Kembalikan foto bawaan">
+                                            ↺ Reset
+                                        </button>
+                                    </div>
+
+                                    <div class="space-y-2 pt-1">
+                                        <div>
+                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Label Header Card</label>
+                                            <input type="text" name="outline_plant2_title_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_title', $editLocale, 'Plant 2 - Karawang') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Nama Lokasi Kawasan</label>
+                                            <input type="text" name="outline_plant2_name_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_name', $editLocale, 'Suryacipta City of Industry, Karawang') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] font-mono text-slate-500 uppercase block font-bold">Tag Peran Pabrik</label>
+                                            <input type="text" name="outline_plant2_tag_{{ $editLocale }}" value="{{ \App\Models\LandingPageSetting::getForLocale('outline_plant2_tag', $editLocale, 'Mass Forging Center') }}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-black">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

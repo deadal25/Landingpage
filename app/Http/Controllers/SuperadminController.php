@@ -291,11 +291,18 @@ class SuperadminController extends Controller
                 continue;
             }
             $targetSettingKey = preg_replace('/_file$/', '', $fileKey);
-            $folder = str_contains($targetSettingKey, 'tech') ? 'images/hero' : 'images/business';
+            $folder = (str_contains($targetSettingKey, 'tech') || str_contains($targetSettingKey, 'about') || str_contains($targetSettingKey, 'plant') || str_contains($targetSettingKey, 'hero')) ? 'images/hero' : 'images/business';
             if ($path = $this->storeUploadedFile($file, $folder, $targetSettingKey)) {
                 $data[$targetSettingKey] = $path;
             }
             unset($data[$fileKey]);
+        }
+
+        // Handle Base64 Data URIs for profile images (e.g. about_hero_image, plant images)
+        foreach (['about_hero_image', 'outline_plant1_image', 'outline_plant2_image'] as $imgKey) {
+            if (isset($data[$imgKey]) && is_string($data[$imgKey]) && str_starts_with($data[$imgKey], 'data:image/')) {
+                $data[$imgKey] = $this->saveBase64Image($data[$imgKey], 'images/hero');
+            }
         }
 
         if ($request->has('network_facilities_json')) {

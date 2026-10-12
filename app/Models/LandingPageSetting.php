@@ -27,12 +27,18 @@ class LandingPageSetting extends Model
         $settings = static::allKeyed();
         $locale = app()->getLocale();
 
-        // 1. If locale-aware, check for localized key (e.g. hero_headline_ja)
-        if ($localeAware) {
-            $localizedKey = "{$key}_{$locale}";
-            if (isset($settings[$localizedKey]) && $settings[$localizedKey] !== '' && $settings[$localizedKey] !== null) {
-                return $settings[$localizedKey];
+        // 0. If not locale-aware (e.g. image URLs, numbers, flags), directly check base key
+        if (!$localeAware) {
+            if (isset($settings[$key]) && $settings[$key] !== '' && $settings[$key] !== null) {
+                return $settings[$key];
             }
+            return $default;
+        }
+
+        // 1. If locale-aware, check for localized key (e.g. hero_headline_ja)
+        $localizedKey = "{$key}_{$locale}";
+        if (isset($settings[$localizedKey]) && $settings[$localizedKey] !== '' && $settings[$localizedKey] !== null) {
+            return $settings[$localizedKey];
         }
 
         // 2. If locale is Indonesian (id), check base key or _id key
