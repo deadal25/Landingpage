@@ -31,4 +31,11 @@ if (env('APP_BOOTSTRAP_PATH')) {
     $app->useBootstrapPath(env('APP_BOOTSTRAP_PATH'));
 }
 
+if (isset($_SERVER['VERCEL']) || env('VERCEL') || env('APP_STORAGE')) {
+    config([
+        'cache.default' => 'array',
+        'session.driver' => 'cookie',
+    ]);
+}
+
 return $app;
