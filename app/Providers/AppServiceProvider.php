@@ -11,7 +11,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if (isset($_SERVER['VERCEL']) || env('VERCEL') || env('APP_STORAGE')) {
+            config([
+                'cache.default' => 'array',
+                'session.driver' => 'cookie',
+            ]);
+        }
     }
 
     /**
