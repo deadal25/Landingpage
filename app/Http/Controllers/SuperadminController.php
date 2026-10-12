@@ -675,6 +675,8 @@ class SuperadminController extends Controller
             'image' => 'nullable',
             'images' => 'nullable|array',
             'images.*' => 'nullable',
+            'new_data_images' => 'nullable|array',
+            'new_data_images.*' => 'nullable|string',
         ]);
 
         $baseSlug = Str::slug($validated['name']);
@@ -688,8 +690,19 @@ class SuperadminController extends Controller
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['order'] = $validated['order'] ?? 0;
 
-        // Multi-image upload handling for products (up to 10+ images)
+        // Multi-image upload handling for products (supports up to 10+ images)
         $uploadedImages = [];
+
+        // 1. Process client-compressed Base64 Data URIs (allows removing photos with X before upload)
+        if ($request->filled('new_data_images') && is_array($request->input('new_data_images'))) {
+            foreach ($request->input('new_data_images') as $dataUri) {
+                if (is_string($dataUri) && str_starts_with($dataUri, 'data:image/')) {
+                    $uploadedImages[] = $this->saveBase64Image($dataUri, 'images/products');
+                }
+            }
+        }
+
+        // 2. Process standard multipart file uploads
         if ($request->hasFile('images')) {
             $files = $request->file('images');
             if (!is_array($files)) {
@@ -714,6 +727,8 @@ class SuperadminController extends Controller
                 array_unshift($uploadedImages, $path);
             }
         }
+
+        $uploadedImages = array_values(array_unique(array_filter($uploadedImages)));
 
         if (empty($uploadedImages)) {
             $uploadedImages = ['/images/products/product-transmission-gear.jpg'];
@@ -744,14 +759,35 @@ class SuperadminController extends Controller
             'image' => 'nullable',
             'images' => 'nullable|array',
             'images.*' => 'nullable',
+            'has_existing_images_list' => 'nullable',
+            'existing_images_json' => 'nullable|string',
+            'new_data_images' => 'nullable|array',
+            'new_data_images.*' => 'nullable|string',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['is_featured'] = $request->boolean('is_featured');
 
-        $existingImages = is_array($product->images) ? $product->images : ($product->image ? [$product->image] : []);
+        // 1. Existing retained images after user deletes unwanted photos with 'X' button
+        if ($request->has('has_existing_images_list')) {
+            $rawExisting = json_decode($request->input('existing_images_json', '[]'), true);
+            $existingImages = is_array($rawExisting) ? $rawExisting : [];
+        } else {
+            $existingImages = is_array($product->images) ? $product->images : ($product->image ? [$product->image] : []);
+        }
+
         $newUploaded = [];
 
+        // 2. Client-compressed Base64 Data URIs (newly selected photos in edit modal)
+        if ($request->filled('new_data_images') && is_array($request->input('new_data_images'))) {
+            foreach ($request->input('new_data_images') as $dataUri) {
+                if (is_string($dataUri) && str_starts_with($dataUri, 'data:image/')) {
+                    $newUploaded[] = $this->saveBase64Image($dataUri, 'images/products');
+                }
+            }
+        }
+
+        // 3. Process standard multipart file uploads
         if ($request->hasFile('images')) {
             $files = $request->file('images');
             if (!is_array($files)) {
@@ -770,14 +806,13 @@ class SuperadminController extends Controller
             }
         }
 
-        if (!empty($newUploaded)) {
-            $combined = array_values(array_unique(array_merge($newUploaded, $existingImages)));
-            $validated['images'] = $combined;
-            $validated['image'] = $combined[0];
-        } else {
-            $validated['images'] = $existingImages;
-            $validated['image'] = $product->image ?: ($existingImages[0] ?? '/images/products/product-transmission-gear.jpg');
+        $combined = array_values(array_unique(array_filter(array_merge($existingImages, $newUploaded))));
+        if (empty($combined)) {
+            $combined = ['/images/products/product-transmission-gear.jpg'];
         }
+
+        $validated['images'] = $combined;
+        $validated['image'] = $combined[0];
 
         $product->update($validated);
 
