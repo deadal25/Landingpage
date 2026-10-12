@@ -77,6 +77,102 @@ class SuperadminController extends Controller
      * @param string|null $prefix Optional filename prefix
      * @return string|null Web-accessible path or data URI
      */
+    /**
+     * Compress an image file to a lightweight Base64 JPEG Data URI using GD.
+     */
+    protected function compressImageToDataUri(string $filePath, string $mime = 'image/jpeg', int $maxWidth = 1200, int $maxHeight = 1200, int $quality = 82): ?string
+    {
+        if (!extension_loaded('gd') || !file_exists($filePath)) {
+            return null;
+        }
+
+        try {
+            $imgInfo = @getimagesize($filePath);
+            if (!$imgInfo) {
+                return null;
+            }
+
+            $srcImg = null;
+            switch ($imgInfo[2]) {
+                case IMAGETYPE_JPEG:
+                    $srcImg = @imagecreatefromjpeg($filePath);
+                    break;
+                case IMAGETYPE_PNG:
+                    $srcImg = @imagecreatefrompng($filePath);
+                    break;
+                case IMAGETYPE_WEBP:
+                    if (function_exists('imagecreatefromwebp')) {
+                        $srcImg = @imagecreatefromwebp($filePath);
+                    }
+                    break;
+                case IMAGETYPE_GIF:
+                    $srcImg = @imagecreatefromgif($filePath);
+                    break;
+            }
+
+            if (!$srcImg) {
+                return null;
+            }
+
+            $origW = imagesx($srcImg);
+            $origH = imagesy($srcImg);
+
+            $scale = min($maxWidth / max($origW, 1), $maxHeight / max($origH, 1), 1.0);
+            $newW = (int) round($origW * $scale);
+            $newH = (int) round($origH * $scale);
+
+            $dstImg = imagecreatetruecolor($newW, $newH);
+            $white = imagecolorallocate($dstImg, 255, 255, 255);
+            imagefilledrectangle($dstImg, 0, 0, $newW, $newH, $white);
+
+            imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+
+            ob_start();
+            imagejpeg($dstImg, null, $quality);
+            $jpegData = ob_get_clean();
+
+            imagedestroy($srcImg);
+            imagedestroy($dstImg);
+
+            if ($jpegData) {
+                return 'data:image/jpeg;base64,' . base64_encode($jpegData);
+            }
+        } catch (\Throwable $e) {
+            // fallback
+        }
+
+        return null;
+    }
+
+    /**
+     * Save base64 image string to disk if public directory is writable, otherwise preserve Data URI.
+     */
+    protected function saveBase64Image(string $dataUri, string $folder = 'images/news'): string
+    {
+        $folder = trim($folder, '/');
+        $publicDir = public_path($folder);
+
+        if (is_dir($publicDir) && is_writable($publicDir)) {
+            try {
+                if (preg_match('/^data:image\/(\w+);base64,/', $dataUri, $type)) {
+                    $data = substr($dataUri, strpos($dataUri, ',') + 1);
+                    $data = base64_decode($data);
+                    if ($data !== false) {
+                        $ext = strtolower($type[1]);
+                        if ($ext === 'jpeg') $ext = 'jpg';
+                        $filename = time() . '_' . uniqid() . '.' . $ext;
+                        file_put_contents($publicDir . '/' . $filename, $data);
+                        return '/' . $folder . '/' . $filename;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // fall through
+            }
+        }
+
+        return $dataUri;
+    }
+
     protected function storeUploadedFile($file, string $folder = 'images/news', ?string $prefix = null): ?string
     {
         if (!$file || !is_object($file) || !method_exists($file, 'isValid') || !$file->isValid()) {
@@ -88,7 +184,7 @@ class SuperadminController extends Controller
         $baseName = $prefix ? Str::slug($prefix) : Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $filename = time() . '_' . uniqid() . ($baseName ? '_' . $baseName : '') . '.' . $ext;
 
-        // 1. Try public_path first (standard hosting / localhost)
+        // 1. Try public_path first if writable (standard hosting / localhost)
         $publicDir = public_path($folder);
         try {
             if (!is_dir($publicDir)) {
@@ -102,44 +198,22 @@ class SuperadminController extends Controller
             // Read-only filesystem fallback
         }
 
-        // 2. Try storage_path('app/public/...') (writable /tmp/storage on Vercel)
+        // 2. Serverless environment (Vercel / read-only filesystem):
+        // Convert to optimized compressed Data URI with GD so it's guaranteed to render without 404
         try {
-            $storageDir = storage_path('app/public/' . $folder);
-            if (!is_dir($storageDir)) {
-                @mkdir($storageDir, 0755, true);
-            }
-            if (is_dir($storageDir) && is_writable($storageDir)) {
-                $file->move($storageDir, $filename);
-                return '/storage/' . $folder . '/' . $filename;
-            }
-        } catch (\Throwable $e) {
-            // Fall through
-        }
-
-        // 3. Try sys_get_temp_dir()
-        try {
-            $tmpDir = sys_get_temp_dir() . '/' . $folder;
-            if (!is_dir($tmpDir)) {
-                @mkdir($tmpDir, 0755, true);
-            }
-            if (is_dir($tmpDir) && is_writable($tmpDir)) {
-                $file->move($tmpDir, $filename);
-                return '/images/' . $folder . '/' . $filename;
-            }
-        } catch (\Throwable $e) {
-            // Fall through
-        }
-
-        // 4. Safe serverless fallback: Base64 data URI for images
-        try {
-            $mime = $file->getMimeType() ?: ('image/' . $ext);
-            if (str_starts_with($mime, 'image/')) {
-                $realPath = method_exists($file, 'getRealPath') ? $file->getRealPath() : null;
-                if ($realPath && file_exists($realPath)) {
-                    $content = @file_get_contents($realPath);
-                    if ($content !== false && strlen($content) > 0) {
-                        return 'data:' . $mime . ';base64,' . base64_encode($content);
+            $realPath = method_exists($file, 'getRealPath') ? $file->getRealPath() : null;
+            if ($realPath && file_exists($realPath)) {
+                $mime = $file->getMimeType() ?: ('image/' . $ext);
+                if (str_starts_with($mime, 'image/') && extension_loaded('gd')) {
+                    $compressed = $this->compressImageToDataUri($realPath, $mime);
+                    if ($compressed) {
+                        return $compressed;
                     }
+                }
+
+                $content = @file_get_contents($realPath);
+                if ($content !== false && strlen($content) > 0) {
+                    return 'data:' . $mime . ';base64,' . base64_encode($content);
                 }
             }
         } catch (\Throwable $e) {
@@ -392,6 +466,8 @@ class SuperadminController extends Controller
             'image' => 'nullable',
             'images' => 'nullable|array',
             'images.*' => 'nullable',
+            'new_data_images' => 'nullable|array',
+            'new_data_images.*' => 'nullable|string',
         ]);
 
         $baseSlug = Str::slug($validated['title']);
@@ -414,6 +490,17 @@ class SuperadminController extends Controller
 
         // Multi-image upload handling (supports up to 10+ images)
         $uploadedImages = [];
+
+        // 1. Process client-compressed Base64 Data URIs (allows removing photos with X before upload)
+        if ($request->filled('new_data_images') && is_array($request->input('new_data_images'))) {
+            foreach ($request->input('new_data_images') as $dataUri) {
+                if (is_string($dataUri) && str_starts_with($dataUri, 'data:image/')) {
+                    $uploadedImages[] = $this->saveBase64Image($dataUri, 'images/news');
+                }
+            }
+        }
+
+        // 2. Process standard multipart file uploads
         if ($request->hasFile('images')) {
             $files = $request->file('images');
             if (!is_array($files)) {
@@ -438,6 +525,8 @@ class SuperadminController extends Controller
                 array_unshift($uploadedImages, $path);
             }
         }
+
+        $uploadedImages = array_values(array_unique(array_filter($uploadedImages)));
 
         if (empty($uploadedImages)) {
             $uploadedImages = ['/images/hero/hero-automotive.jpg'];
@@ -469,6 +558,10 @@ class SuperadminController extends Controller
             'image' => 'nullable',
             'images' => 'nullable|array',
             'images.*' => 'nullable',
+            'has_existing_images_list' => 'nullable',
+            'existing_images_json' => 'nullable|string',
+            'new_data_images' => 'nullable|array',
+            'new_data_images.*' => 'nullable|string',
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
@@ -482,9 +575,26 @@ class SuperadminController extends Controller
             $validated['published_at'] = null;
         }
 
-        $existingImages = is_array($news->images) ? $news->images : ($news->image ? [$news->image] : []);
+        // 1. Existing retained images after user deletes broken/unwanted photos with 'X' button
+        if ($request->has('has_existing_images_list')) {
+            $rawExisting = json_decode($request->input('existing_images_json', '[]'), true);
+            $existingImages = is_array($rawExisting) ? $rawExisting : [];
+        } else {
+            $existingImages = is_array($news->images) ? $news->images : ($news->image ? [$news->image] : []);
+        }
+
         $newUploaded = [];
 
+        // 2. Client-compressed Base64 Data URIs (newly selected photos)
+        if ($request->filled('new_data_images') && is_array($request->input('new_data_images'))) {
+            foreach ($request->input('new_data_images') as $dataUri) {
+                if (is_string($dataUri) && str_starts_with($dataUri, 'data:image/')) {
+                    $newUploaded[] = $this->saveBase64Image($dataUri, 'images/news');
+                }
+            }
+        }
+
+        // 3. Regular file uploads
         if ($request->hasFile('images')) {
             $files = $request->file('images');
             if (!is_array($files)) {
@@ -503,14 +613,15 @@ class SuperadminController extends Controller
             }
         }
 
-        if (!empty($newUploaded)) {
-            $combined = array_values(array_unique(array_merge($newUploaded, $existingImages)));
-            $validated['images'] = $combined;
-            $validated['image'] = $combined[0];
-        } else {
-            $validated['images'] = $existingImages;
-            $validated['image'] = $news->image ?: ($existingImages[0] ?? '/images/hero/hero-automotive.jpg');
+        // Combine retained existing photos + newly uploaded photos
+        $combined = array_values(array_unique(array_filter(array_merge($existingImages, $newUploaded))));
+
+        if (empty($combined)) {
+            $combined = ['/images/hero/hero-automotive.jpg'];
         }
+
+        $validated['images'] = $combined;
+        $validated['image'] = $combined[0];
 
         $news->update($validated);
 

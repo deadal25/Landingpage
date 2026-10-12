@@ -42,7 +42,7 @@
             @if(!empty($newsImages))
                 <div class="space-y-4" x-data="{
                     activeIdx: 0,
-                    gallery: {{ json_encode(array_values(array_map(fn($img) => str_starts_with($img, 'http') ? $img : asset($img), $newsImages))) }},
+                    gallery: {{ json_encode(array_values(array_map(fn($img) => (str_starts_with($img, 'http') || str_starts_with($img, 'data:')) ? $img : asset($img), $newsImages))) }},
                     next() { this.activeIdx = (this.activeIdx + 1) % this.gallery.length; },
                     prev() { this.activeIdx = (this.activeIdx - 1 + this.gallery.length) % this.gallery.length; }
                 }">

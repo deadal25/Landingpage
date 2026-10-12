@@ -139,12 +139,20 @@ Route::redirect('superadmin', '/SuperadminMusashi');
 
 // Serve dynamic/uploaded media from storage or temporary directory across environments (e.g. Vercel)
 Route::get('/storage/{path}', function ($path) {
-    $filePath = storage_path('app/public/' . $path);
-    if (file_exists($filePath)) {
-        $mime = mime_content_type($filePath) ?: 'application/octet-stream';
-        return response()->file($filePath, ['Content-Type' => $mime]);
+    $candidates = [
+        storage_path('app/public/' . $path),
+        public_path('storage/' . $path),
+        public_path($path),
+        sys_get_temp_dir() . '/' . $path,
+    ];
+    foreach ($candidates as $filePath) {
+        if (file_exists($filePath) && is_file($filePath)) {
+            $mime = @mime_content_type($filePath) ?: 'image/jpeg';
+            return response()->file($filePath, ['Content-Type' => $mime]);
+        }
     }
-    abort(404);
+    // Safe graceful fallback to avoid broken image icons
+    return redirect('/images/hero/hero-automotive.jpg');
 })->where('path', '.*');
 
 Route::get('/images/{folder}/{filename}', function ($folder, $filename) {
@@ -155,12 +163,12 @@ Route::get('/images/{folder}/{filename}', function ($folder, $filename) {
         sys_get_temp_dir() . "/images/{$folder}/{$filename}",
     ];
     foreach ($candidates as $candidate) {
-        if (file_exists($candidate)) {
-            $mime = mime_content_type($candidate) ?: 'application/octet-stream';
+        if (file_exists($candidate) && is_file($candidate)) {
+            $mime = @mime_content_type($candidate) ?: 'image/jpeg';
             return response()->file($candidate, ['Content-Type' => $mime]);
         }
     }
-    abort(404);
+    return redirect('/images/hero/hero-automotive.jpg');
 })->where('filename', '.*');
 
 

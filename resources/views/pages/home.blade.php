@@ -170,7 +170,7 @@
                     
                     @foreach($latestNews as $news)
                         @php
-                            $cardImageUrls = array_values(array_map(fn($img) => str_starts_with($img, 'http') ? $img : asset($img), $news->all_images ?: [$news->image ?: 'images/hero/hero-automotive.jpg']));
+                            $cardImageUrls = array_values(array_map(fn($img) => (str_starts_with($img, 'http') || str_starts_with($img, 'data:')) ? $img : asset($img), $news->all_images ?: [$news->image ?: 'images/hero/hero-automotive.jpg']));
                         @endphp
                         <article 
                             x-data="{
@@ -214,7 +214,7 @@
                                 title: {{ json_encode($news->title) }},
                                 category: {{ json_encode($news->category) }},
                                 date: '{{ $news->published_at ? $news->published_at->format('Y.m.d') : $news->created_at->format('Y.m.d') }}',
-                                image: '{{ $news->image ? asset($news->image) : asset('images/hero/hero-automotive.jpg') }}',
+                                image: '{{ ($news->image && (str_starts_with($news->image, 'http') || str_starts_with($news->image, 'data:'))) ? $news->image : asset($news->image ?: 'images/hero/hero-automotive.jpg') }}',
                                 images: {{ json_encode($cardImageUrls) }},
                                 content: {{ json_encode($news->content) }},
                                 url: '{{ route('news.show', $news->slug) }}'

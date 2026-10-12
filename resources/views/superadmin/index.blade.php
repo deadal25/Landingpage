@@ -57,7 +57,10 @@
           showCreateProduct: false,
           editingProduct: null,
           showCreateDirector: false,
-          editingDirector: null
+          editingDirector: null,
+          createNewsPhotos: [],
+          editNewPhotos: [],
+          isCompressingPhotos: false
       }">
 
     <!-- Mobile Sidebar Backdrop Overlay -->
@@ -1023,10 +1026,58 @@
                                     <span>{{ $editLocale === 'ja' ? 'ニュース写真アップロード (1〜10枚以上対応) *' : ($editLocale === 'en' ? 'Upload News Photos (1 to 10+ photos) *' : 'Upload Foto Berita (Bisa 1 s/d 10+ Foto) *') }}</span>
                                     <span class="text-musashi-red text-[10px] font-bold">Multi-Upload Didukung</span>
                                 </label>
-                                <input type="file" name="images[]" multiple accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-musashi-red hover:file:bg-red-100 cursor-pointer border border-slate-200 rounded-xl p-1.5 bg-white">
+                                <input type="file" 
+                                       multiple 
+                                       accept="image/*" 
+                                       @change="async (e) => {
+                                           isCompressingPhotos = true;
+                                           const files = Array.from(e.target.files || []);
+                                           for (const f of files) {
+                                               const res = await window.compressFileToDataUrl(f);
+                                               if (res) createNewsPhotos.push(res);
+                                           }
+                                           e.target.value = '';
+                                           isCompressingPhotos = false;
+                                       }"
+                                       class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-musashi-red hover:file:bg-red-100 cursor-pointer border border-slate-200 rounded-xl p-1.5 bg-white">
                                 <span class="text-[10px] text-slate-500 block mt-1.5">
-                                    💡 <strong>Tips:</strong> Anda bisa memilih <strong>1, 3, 5, bahkan 10 foto sekaligus</strong> dalam 1 berita (Tahan tombol <em>Ctrl</em> atau <em>Shift</em> saat memilih file foto). Foto pertama otomatis menjadi cover utama, dan foto lainnya menjadi galeri artikel.
+                                    💡 <strong>Tips:</strong> Anda bisa memilih <strong>1, 3, 5, bahkan 10 foto sekaligus</strong>. Foto pertama (#1) otomatis menjadi sampul cover, dan foto lainnya menjadi galeri artikel.
                                 </span>
+
+                                <!-- Loading / Optimizing Indicator -->
+                                <div x-show="isCompressingPhotos" style="display: none;" class="mt-2 text-xs font-mono text-musashi-red flex items-center gap-1.5 animate-pulse">
+                                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                    <span>Memproses & mengoptimalkan foto...</span>
+                                </div>
+
+                                <!-- Preview Grid with Red 'X' Delete Button on Top Right -->
+                                <div x-show="createNewsPhotos.length > 0" class="mt-3 p-3.5 bg-red-50/50 border border-red-200/80 rounded-2xl space-y-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-mono text-slate-800 uppercase font-bold flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-musashi-red" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
+                                            <span>Foto Terpilih (<span x-text="createNewsPhotos.length"></span> Foto) — Klik <span class="text-musashi-red font-bold">X</span> untuk menghapus:</span>
+                                        </span>
+                                        <button type="button" @click="createNewsPhotos = []" class="text-[10px] text-red-600 hover:text-red-800 font-mono font-bold hover:underline">Hapus Semua</button>
+                                    </div>
+                                    <div class="flex flex-wrap gap-3">
+                                        <template x-for="(pic, idx) in createNewsPhotos" :key="idx">
+                                            <div class="relative w-20 h-20 rounded-xl overflow-visible border-2 border-slate-300 bg-white shadow-xs group">
+                                                <div class="w-full h-full rounded-[10px] overflow-hidden">
+                                                    <img :src="pic" class="w-full h-full object-cover">
+                                                </div>
+                                                <!-- Red Circle 'X' Button on Top Right -->
+                                                <button type="button" 
+                                                        @click="createNewsPhotos.splice(idx, 1)" 
+                                                        title="Hapus / batalkan foto ini"
+                                                        class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-115 cursor-pointer border-2 border-white z-20">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                                <span class="absolute bottom-0 inset-x-0 bg-black/80 text-white text-[9px] font-mono text-center py-0.5 rounded-b-[9px]" x-text="idx === 0 ? '#1 Cover' : '#' + (idx + 1)"></span>
+                                                <input type="hidden" name="new_data_images[]" :value="pic">
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="space-y-3 pt-2">
@@ -1068,7 +1119,7 @@
                                     <tr class="hover:bg-slate-50/70 transition-colors">
                                         <td class="py-3 px-4 w-28">
                                             <div class="relative inline-block">
-                                                <img src="{{ asset($news->image ?? 'images/hero/hero-automotive.jpg') }}" alt="" class="w-16 h-12 object-cover rounded-lg border border-slate-200 shadow-xs">
+                                                <img src="{{ ($news->image && (str_starts_with($news->image, 'http') || str_starts_with($news->image, 'data:'))) ? $news->image : asset($news->image ?: 'images/hero/hero-automotive.jpg') }}" alt="" class="w-16 h-12 object-cover rounded-lg border border-slate-200 shadow-xs" onerror="this.onerror=null; this.src='/images/hero/hero-automotive.jpg';">
                                                 @if(count($news->all_images) > 1)
                                                     <span class="absolute -bottom-1.5 -right-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-musashi-red text-white shadow-xs">
                                                         +{{ count($news->all_images) }} foto
@@ -1099,7 +1150,7 @@
                                         </td>
                                         <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
                                             <button 
-                                                @click="editingNews = {{ json_encode($news) }}" 
+                                                @click="editingNews = JSON.parse(JSON.stringify({{ json_encode($news) }})); editNewPhotos = [];" 
                                                 class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
                                                 {{ $editLocale === 'ja' ? '編集' : ($editLocale === 'en' ? 'Edit' : 'Edit') }}
                                             </button>
@@ -1164,22 +1215,89 @@
                                     <label class="text-[11px] font-mono text-slate-700 uppercase block mb-1 font-bold">
                                         {{ $editLocale === 'ja' ? '新しい写真の追加 / アップロード (複数可)' : ($editLocale === 'en' ? 'Upload / Add New Photos (Multiple)' : 'Upload / Tambah Foto Baru (Bisa Banyak)') }}
                                     </label>
-                                    <input type="file" name="images[]" multiple accept="image/*" class="w-full text-xs text-slate-500 border border-slate-200 rounded-xl p-1 bg-white">
+                                    <input type="file" 
+                                           multiple 
+                                           accept="image/*" 
+                                           @change="async (e) => {
+                                               isCompressingPhotos = true;
+                                               const files = Array.from(e.target.files || []);
+                                               for (const f of files) {
+                                                   const res = await window.compressFileToDataUrl(f);
+                                                   if (res) editNewPhotos.push(res);
+                                               }
+                                               e.target.value = '';
+                                               isCompressingPhotos = false;
+                                           }"
+                                           class="w-full text-xs text-slate-500 border border-slate-200 rounded-xl p-1 bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-musashi-red hover:file:bg-red-100 cursor-pointer">
                                     <span class="text-[10px] text-slate-400 block mt-1">
                                         {{ $editLocale === 'ja' ? '複数の写真を一度に選択できます（最大10枚）' : ($editLocale === 'en' ? 'Can select multiple photos at once (up to 10 photos).' : 'Bisa pilih beberapa foto sekaligus (hingga 10 foto).') }}
                                     </span>
+
+                                    <!-- Loading indicator -->
+                                    <div x-show="isCompressingPhotos" style="display: none;" class="mt-1.5 text-xs font-mono text-musashi-red flex items-center gap-1.5 animate-pulse">
+                                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                        <span>Memproses & mengoptimalkan foto baru...</span>
+                                    </div>
+
+                                    <!-- Preview of Newly Added Photos with 'X' button -->
+                                    <div x-show="editNewPhotos.length > 0" class="mt-2.5 p-3 bg-red-50/60 border border-red-200 rounded-xl space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-[11px] font-mono text-slate-800 uppercase font-bold flex items-center gap-1">
+                                                <span class="text-musashi-red">+ Foto Baru yang Dipilih</span> (<span x-text="editNewPhotos.length"></span> foto) — Klik tanda <span class="text-musashi-red font-bold">X</span> untuk membatalkan:
+                                            </span>
+                                            <button type="button" @click="editNewPhotos = []" class="text-[10px] text-red-600 hover:text-red-800 font-mono font-bold hover:underline">Batalkan Semua</button>
+                                        </div>
+                                        <div class="flex flex-wrap gap-3">
+                                            <template x-for="(npic, nidx) in editNewPhotos" :key="'new_'+nidx">
+                                                <div class="relative w-20 h-20 rounded-xl overflow-visible border-2 border-red-300 bg-white shadow-xs group">
+                                                    <div class="w-full h-full rounded-[10px] overflow-hidden">
+                                                        <img :src="npic" class="w-full h-full object-cover">
+                                                    </div>
+                                                    <!-- Delete 'X' Button on Top Right -->
+                                                    <button type="button" 
+                                                            @click="editNewPhotos.splice(nidx, 1)" 
+                                                            title="Batalkan foto baru ini"
+                                                            class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-115 cursor-pointer border-2 border-white z-20">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    </button>
+                                                    <span class="absolute bottom-0 inset-x-0 bg-red-600/90 text-white text-[8px] font-mono text-center py-0.5 rounded-b-[9px]">Baru</span>
+                                                    <input type="hidden" name="new_data_images[]" :value="npic">
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- Current Photos Preview in Edit Modal -->
-                                <div x-show="editingNews.all_images && editingNews.all_images.length" class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                                    <span class="text-[11px] font-mono text-slate-600 uppercase font-bold block">
-                                        {{ $editLocale === 'ja' ? '現在設定されている写真' : ($editLocale === 'en' ? 'Current Photos' : 'Foto Saat Ini Terpasang') }} (<span x-text="editingNews.all_images.length"></span> {{ $editLocale === 'ja' ? '枚' : 'Foto' }}):
-                                    </span>
-                                    <div class="flex flex-wrap gap-2.5">
+                                <!-- Hidden input to submit updated list of retained existing photos -->
+                                <input type="hidden" name="has_existing_images_list" value="1">
+                                <input type="hidden" name="existing_images_json" :value="JSON.stringify(editingNews.all_images || [])">
+
+                                <!-- Current Photos Preview in Edit Modal with Red 'X' Delete Button -->
+                                <div x-show="editingNews.all_images && editingNews.all_images.length" class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-mono text-slate-700 uppercase font-bold block">
+                                            {{ $editLocale === 'ja' ? '現在設定されている写真' : ($editLocale === 'en' ? 'Current Photos' : 'Foto Saat Ini Terpasang') }} (<span x-text="editingNews.all_images.length"></span> {{ $editLocale === 'ja' ? '枚' : 'Foto' }}):
+                                        </span>
+                                        <span class="text-[10px] text-slate-500 font-mono">
+                                            💡 Klik tanda <strong class="text-red-600 font-bold">X merah</strong> pada foto untuk menghapus foto itu
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-3">
                                         <template x-for="(pic, pidx) in editingNews.all_images" :key="pidx">
-                                            <div class="relative w-16 h-14 rounded-lg overflow-hidden border border-slate-200 bg-white shadow-xs">
-                                                <img :src="pic" class="w-full h-full object-cover">
-                                                <span class="absolute bottom-0 right-0 bg-black/70 text-white text-[9px] font-mono px-1 rounded-tl" x-text="'#' + (pidx + 1)"></span>
+                                            <div class="relative w-20 h-20 rounded-xl overflow-visible border-2 border-slate-200 bg-white shadow-xs group">
+                                                <div class="w-full h-full rounded-[10px] overflow-hidden bg-slate-100 flex items-center justify-center">
+                                                    <img :src="pic" 
+                                                         class="w-full h-full object-cover"
+                                                         onerror="this.onerror=null; this.src='/images/hero/hero-automotive.jpg'; this.classList.add('opacity-40');">
+                                                </div>
+                                                <!-- Red Circle 'X' Button on Top Right -->
+                                                <button type="button" 
+                                                        @click="editingNews.all_images.splice(pidx, 1)" 
+                                                        title="Hapus foto ini dari berita"
+                                                        class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-115 cursor-pointer border-2 border-white z-20">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                                <span class="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[9px] font-mono text-center py-0.5 rounded-b-[9px]" x-text="pidx === 0 ? '#1 Cover' : '#' + (pidx + 1)"></span>
                                             </div>
                                         </template>
                                     </div>
@@ -4129,5 +4247,50 @@
         </main>
     </div>
 
+    <script>
+        window.compressFileToDataUrl = function(file) {
+            return new Promise((resolve) => {
+                if (!file || !file.type.startsWith('image/')) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const maxDim = 1200;
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) {
+                                h = Math.round((h * maxDim) / w);
+                                w = maxDim;
+                            } else {
+                                w = Math.round((w * maxDim) / h);
+                                h = maxDim;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, w, h);
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = function() {
+                        resolve(e.target.result);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.onerror = function() {
+                    resolve(null);
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+    </script>
 </body>
 </html>
