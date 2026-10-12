@@ -29,7 +29,7 @@
             </div>
 
             <!-- Middle / Right: Main Navigation (Desktop) matching musashi.co.id exactly -->
-            <nav class="hidden lg:flex items-center space-x-5 xl:space-x-8 2xl:space-x-10 whitespace-nowrap font-sans text-sm xl:text-[15px] 2xl:text-base font-medium text-white">
+            <nav class="hidden lg:flex items-center space-x-4 xl:space-x-7 2xl:space-x-9 whitespace-nowrap font-sans text-xs xl:text-sm 2xl:text-base font-medium text-white">
 
                 <!-- 1. Company (Dropdown) -->
                 <div class="relative" @click.away="companyOpen = false">

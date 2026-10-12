@@ -75,7 +75,7 @@
         <div class="pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             
             <!-- Left: Follow us -->
-            <div class="text-xs sm:text-sm text-white/90 pl-12 sm:pl-14 xl:pl-0">
+            <div class="text-xs sm:text-sm text-white/90 pl-14 sm:pl-16 md:pl-20 2xl:pl-0">
                 <div class="flex items-center gap-3">
                     <span class="font-normal text-white">Follow us :</span>
                     <!-- YouTube -->
